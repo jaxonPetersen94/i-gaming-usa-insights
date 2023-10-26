@@ -10,21 +10,47 @@
         <input type="password" name="" required="" />
         <label>Password</label>
       </div>
-      <a>
-        <span></span>
-        <span></span>
-        <span></span>
-        <span></span>
-        Submit
-      </a>
+      <div class="submit-btn-container">
+        <a v-if="!loginProcessing" ref="submitButton" @mouseup="handleMouseUp">
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+          Submit
+        </a>
+        <Preloader v-else />
+      </div>
     </form>
-    <span>Forgot password?</span>
+    <span class="forgot-password">Forgot password?</span>
   </div>
 </template>
 
 <script>
+import Preloader from '../components/Preloader.vue';
+
 export default {
-  // Your component's logic goes here
+  components: {
+    Preloader,
+  },
+  data() {
+    return {
+      loginProcessing: false,
+    };
+  },
+  methods: {
+    handleMouseUp() {
+      const submitButton = this.$refs.submitButton;
+      submitButton.classList.add('submit-btn-animate-out');
+      submitButton.addEventListener(
+        'transitionend',
+        () => {
+          this.loginProcessing = true;
+          submitButton.classList.remove('submit-btn-animate-out');
+        },
+        { once: true },
+      );
+    },
+  },
 };
 </script>
 
@@ -37,6 +63,7 @@ export default {
   top: 50%;
   left: 50%;
   width: 400px;
+  min-height: 384px;
   padding: 40px;
   transform: translate(-50%, -50%);
   background: rgba(0, 0, 0, 0.5);
@@ -53,28 +80,46 @@ export default {
   }
 
   form a {
-    position: relative;
     display: inline-block;
+    position: relative;
     padding: 10px 20px;
-    color: @button;
+    color: @login-button;
     font-size: 16px;
     text-decoration: none;
     text-transform: uppercase;
     overflow: hidden;
-    transition: 0.5s;
-    margin-top: 16px;
-    margin-bottom: 32px;
     letter-spacing: 4px;
     cursor: pointer;
-  }
+    transition: 0.5s;
 
-  span {
-    color: @white;
-    opacity: 60%;
-    transition: opacity 0.3s;
+    &:active {
+      transition: transform 0.2s;
+      transform: scale(0.9);
+    }
   }
+}
 
-  span:hover {
+.submit-btn-container {
+  display: flex;
+  height: 64px;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.submit-btn-animate-out {
+  opacity: 0;
+  transform: scale(1);
+  pointer-events: none;
+}
+
+.forgot-password {
+  color: @white;
+  opacity: 60%;
+  transition: opacity 0.3s;
+  // margin-top: 16px;
+
+  &:hover {
     opacity: 100%;
   }
 }
@@ -113,18 +158,18 @@ export default {
 .login-box .user-box input:valid ~ label {
   top: -20px;
   left: 0;
-  color: @button;
+  color: @login-button;
   font-size: 12px;
 }
 
 .login-box a:hover {
-  background: @button;
+  background: @login-button;
   color: @white;
   border-radius: 5px;
   box-shadow:
-    0 0 4px @button,
-    0 0 8px @button,
-    0 0 16px @button,
+    0 0 4px @login-button,
+    0 0 8px @login-button,
+    0 0 16px @login-button,
     0 0 32px @button-alt;
 }
 
@@ -138,7 +183,7 @@ export default {
   left: -100%;
   width: 100%;
   height: 2px;
-  background: linear-gradient(90deg, transparent, @button);
+  background: linear-gradient(90deg, transparent, @login-button);
   animation: btn-anim1 1s linear infinite;
 }
 
@@ -157,7 +202,7 @@ export default {
   right: 0;
   width: 2px;
   height: 100%;
-  background: linear-gradient(180deg, transparent, @button);
+  background: linear-gradient(180deg, transparent, @login-button);
   animation: btn-anim2 1s linear infinite;
   animation-delay: 0.25s;
 }
@@ -177,7 +222,7 @@ export default {
   right: -100%;
   width: 100%;
   height: 2px;
-  background: linear-gradient(270deg, transparent, @button);
+  background: linear-gradient(270deg, transparent, @login-button);
   animation: btn-anim3 1s linear infinite;
   animation-delay: 0.5s;
 }
@@ -197,7 +242,7 @@ export default {
   left: 0;
   width: 2px;
   height: 100%;
-  background: linear-gradient(360deg, transparent, @button);
+  background: linear-gradient(360deg, transparent, @login-button);
   animation: btn-anim4 1s linear infinite;
   animation-delay: 0.75s;
 }
