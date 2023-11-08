@@ -4,7 +4,7 @@ import Dashboard from './views/Dashboard.vue';
 
 const routes = [
   {
-    path: '/',
+    path: '/:page(dashboard)?',
     name: 'Dashboard',
     component: Dashboard,
   },
@@ -23,7 +23,7 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   const isAuthenticated = false;
 
-  if (to.path === '/login' || to.path === '/dashboard') {
+  if (to.params.page === 'dashboard' || to.path === '/login') {
     next();
   } else if (!isAuthenticated) {
     next('/login');

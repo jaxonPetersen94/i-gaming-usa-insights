@@ -1,54 +1,214 @@
 <template>
-  <div class="login-box">
-    <h2>Login</h2>
+  <div ref="formBox" class="form-box">
+    <div class="form-box-title">
+      <h2 ref="formTitleText" class="form-title-text">{{ formType }}</h2>
+      <h2 @mouseup="toggleFormType" class="opposite-form-text">
+        {{ oppositeFormType }}?
+      </h2>
+    </div>
     <form>
-      <div class="user-box">
-        <input type="text" name="" required="" />
-        <label>Username</label>
+      <div
+        class="inputs-container"
+        :class="{
+          'inputs-container-override': toggledRegisterForm,
+          'inputs-container-final': displayRegisterInputs,
+        }"
+      >
+        <div
+          class="input-box"
+          :class="{
+            'input-box-register-first': !displayRegisterInputs,
+            'input-box-register-first-override':
+              toggledRegisterForm && !displayRegisterInputs,
+          }"
+        >
+          <input type="text" name="" required="" />
+          <label>First Name</label>
+        </div>
+        <div
+          class="input-box"
+          :class="{
+            'input-box-register': !displayRegisterInputs,
+            'input-box-register-override':
+              toggledRegisterForm && !displayRegisterInputs,
+          }"
+        >
+          <input type="text" name="" required="" />
+          <label>Last Name</label>
+        </div>
+        <div class="input-box">
+          <input type="text" name="" required="" />
+          <label ref="usernameEmailText">
+            {{ usernameOrEmail }}
+          </label>
+        </div>
+        <div class="input-box">
+          <input type="password" name="" required="" />
+          <label>Password</label>
+        </div>
+        <div
+          class="input-box"
+          :class="{
+            'input-box-register-last': !displayRegisterInputs,
+            'input-box-register-last-override':
+              toggledRegisterForm && !displayRegisterInputs,
+            'input-box-register-last-final': displayRegisterInputs,
+          }"
+        >
+          <input type="password" name="" required="" />
+          <label>Confirm Password</label>
+        </div>
       </div>
-      <div class="user-box">
-        <input type="password" name="" required="" />
-        <label>Password</label>
-      </div>
-      <div class="submit-btn-container">
-        <a v-if="!loginProcessing" ref="submitButton" @mouseup="handleMouseUp">
-          <span></span>
-          <span></span>
-          <span></span>
-          <span></span>
-          Submit
-        </a>
-        <Preloader v-else />
+      <div
+        class="submit-forgot-container"
+        :class="{
+          'submit-forgot-container-override': toggledRegisterForm,
+          'submit-forgot-container-final': displayRegisterInputs,
+        }"
+      >
+        <div class="submit-btn-container">
+          <a v-if="!loginProcessing" ref="submitButton" @mouseup="handleSubmit">
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            Submit
+          </a>
+          <Preloader v-else />
+        </div>
+        <span
+          class="forgot-password"
+          :class="{
+            'forgot-password-fade-out': toggledRegisterForm,
+            'forgot-password-fade-in': shouldFadeInForgotPassword,
+          }"
+          >Forgot password?</span
+        >
       </div>
     </form>
-    <span class="forgot-password">Forgot password?</span>
   </div>
 </template>
 
 <script>
+import { ref, onMounted } from 'vue';
 import Preloader from '../components/Preloader.vue';
+import { UserStore } from '@/stores/UserStore';
+import TextScramble from '../utilities/TextScrambler';
 
 export default {
   components: {
     Preloader,
   },
-  data() {
+  setup() {
+    const formBox = ref(null);
+    const submitButton = ref(null);
+    const formTitleText = ref(null);
+    const usernameEmailText = ref(null);
+
+    const formType = ref('Login');
+    const usernameOrEmail = ref('Username');
+    const loginProcessing = ref(false);
+    const formTransitionOccuring = ref(false);
+    const displayRegisterInputs = ref(false);
+
+    const registerPageVisited = ref(false);
+
+    let formTitleTextScramble;
+    let usernameEmailTextScramble;
+
+    onMounted(() => {
+      if (formTitleText.value) {
+        formTitleTextScramble = new TextScramble(formTitleText.value);
+      }
+      if (usernameEmailText.value) {
+        usernameEmailTextScramble = new TextScramble(usernameEmailText.value);
+      }
+    });
+
+    const toggleFormType = () => {
+      if (!registerPageVisited.value) {
+        console.log('asopdjawioqjdc');
+        registerPageVisited.value = true;
+      }
+
+      if (!formTransitionOccuring.value) {
+        formType.value = formType.value === 'Login' ? 'Register' : 'Login';
+        usernameOrEmail.value =
+          usernameOrEmail.value === 'Username' ? 'Email' : 'Username';
+        applyScrambleTextEffect(formTitleTextScramble, formType.value);
+        applyScrambleTextEffect(
+          usernameEmailTextScramble,
+          usernameOrEmail.value,
+        );
+        if (formBox.value) {
+          formTransitionOccuring.value = true;
+          if (formType.value === 'Register') {
+            formBox.value.classList.add('register-override');
+          } else {
+            displayRegisterInputs.value = false;
+            formBox.value.classList.remove('register-override');
+          }
+          formBox.value.addEventListener('transitionend', handleTransitionEnd);
+        }
+      }
+    };
+
+    const handleTransitionEnd = (event) => {
+      if (event.target === formBox.value) {
+        formTransitionOccuring.value = false;
+        if (formType.value === 'Register') {
+          displayRegisterInputs.value = true;
+        }
+        formBox.value.removeEventListener('transitionend', handleTransitionEnd);
+      }
+    };
+
+    const applyScrambleTextEffect = (textScrambleInstance, newText) => {
+      if (textScrambleInstance) {
+        textScrambleInstance.setText(newText);
+      }
+    };
+
+    const handleSubmit = async () => {
+      if (submitButton.value) {
+        submitButton.value.classList.add('submit-btn-animate-out');
+        submitButton.value.addEventListener(
+          'transitionend',
+          () => {
+            submitButton.value.classList.remove('submit-btn-animate-out');
+            loginProcessing.value = true;
+          },
+          { once: true },
+        );
+        const userStore = UserStore();
+        userStore.signInUser();
+      }
+    };
+
     return {
-      loginProcessing: false,
+      formBox,
+      submitButton,
+      formTitleText,
+      usernameEmailText,
+      formType,
+      usernameOrEmail,
+      loginProcessing,
+      formTransitionOccuring,
+      displayRegisterInputs,
+      registerPageVisited,
+      toggleFormType,
+      handleSubmit,
     };
   },
-  methods: {
-    handleMouseUp() {
-      const submitButton = this.$refs.submitButton;
-      submitButton.classList.add('submit-btn-animate-out');
-      submitButton.addEventListener(
-        'transitionend',
-        () => {
-          this.loginProcessing = true;
-          submitButton.classList.remove('submit-btn-animate-out');
-        },
-        { once: true },
-      );
+  computed: {
+    oppositeFormType() {
+      return this.formType === 'Login' ? 'Register' : 'Login';
+    },
+    shouldFadeInForgotPassword() {
+      return this.formType === 'Login' && this.registerPageVisited;
+    },
+    toggledRegisterForm() {
+      return this.formType === 'Register';
     },
   },
 };
@@ -57,22 +217,25 @@ export default {
 <style lang="less" scoped>
 @import '../variables.less';
 
-.login-box {
+.form-box {
+  display: flex;
+  flex-direction: column;
   user-select: none;
   position: absolute;
   top: 50%;
   left: 50%;
   width: 400px;
-  min-height: 384px;
-  padding: 40px;
+  padding: 40px 40px 0px 40px;
   transform: translate(-50%, -50%);
   background: rgba(0, 0, 0, 0.5);
   box-sizing: border-box;
   box-shadow: 0 15px 25px rgba(0, 0, 0, 0.6);
   border-radius: 10px;
+  height: 384px;
+  transition: height 0.7s ease-in-out;
 
   h2 {
-    margin: 0 0 30px;
+    margin: 0;
     padding: 0;
     color: @white;
     text-align: center;
@@ -99,12 +262,86 @@ export default {
   }
 }
 
+.register-override {
+  height: 524px;
+}
+
+.form-box-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  margin: 0 0 30px 0;
+
+  .form-text-container {
+    display: flex;
+    justify-content: center;
+    flex: 1;
+  }
+
+  .form-title-text {
+    flex: 1;
+  }
+
+  .opposite-form-text {
+    position: absolute;
+    right: 0;
+
+    font-size: 14px;
+    font-weight: normal;
+    opacity: 60%;
+    color: @white;
+    transition: opacity 0.3s;
+
+    &:hover {
+      opacity: 100%;
+    }
+  }
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.inputs-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  flex: 1;
+  max-height: 138px;
+  transition: max-height 0.7s ease-in-out;
+
+  &-override {
+    max-height: 276px;
+  }
+
+  &-final {
+    justify-content: flex-start;
+  }
+}
+
+.submit-forgot-container {
+  margin-top: auto;
+  height: 95px;
+  margin-bottom: 40px;
+  transition:
+    margin-bottom 0.7s ease-in-out,
+    height 0.7s ease-in-out;
+
+  &-override {
+    margin-bottom: 0px;
+    height: 68px;
+  }
+}
+
 .submit-btn-container {
   display: flex;
-  height: 64px;
   justify-content: center;
   align-items: center;
-  margin-bottom: 24px;
+  min-height: 40px;
+  margin-bottom: 32px;
 }
 
 .submit-btn-animate-out {
@@ -114,17 +351,30 @@ export default {
 }
 
 .forgot-password {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
   color: @white;
   opacity: 60%;
   transition: opacity 0.3s;
-  // margin-top: 16px;
 
   &:hover {
     opacity: 100%;
   }
+
+  &-fade-out {
+    transition: opacity 0.35s ease-in-out;
+    opacity: 0;
+  }
+
+  &-fade-in {
+    transition: opacity 0.35s ease-in-out !important;
+    transition-delay: 0.3s !important;
+    opacity: 1 !important;
+  }
 }
 
-.login-box .user-box {
+.form-box .input-box {
   position: relative;
   user-select: none;
 
@@ -152,17 +402,57 @@ export default {
     transition: 0.5s;
     user-select: none;
   }
+
+  &-register-first {
+    transition: opacity 0.35s;
+    pointer-events: none;
+    opacity: 0;
+
+    &-override {
+      transition-delay: 0.5s;
+      opacity: 1;
+    }
+  }
+
+  &-register {
+    transition: opacity 0.35s;
+    transition-delay: 0.25s;
+    pointer-events: none;
+    opacity: 0;
+
+    &-override {
+      opacity: 1;
+    }
+  }
+
+  &-register-last {
+    position: absolute;
+    transform: translateY(100%);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.35s;
+    width: 320px;
+
+    &-override {
+      transition-delay: 0.375s;
+      opacity: 1;
+    }
+
+    &-final {
+      position: relative;
+    }
+  }
 }
 
-.login-box .user-box input:focus ~ label,
-.login-box .user-box input:valid ~ label {
+.form-box .input-box input:focus ~ label,
+.form-box .input-box input:valid ~ label {
   top: -20px;
   left: 0;
   color: @login-button;
   font-size: 12px;
 }
 
-.login-box a:hover {
+.form-box a:hover {
   background: @login-button;
   color: @white;
   border-radius: 5px;
@@ -170,15 +460,15 @@ export default {
     0 0 4px @login-button,
     0 0 8px @login-button,
     0 0 16px @login-button,
-    0 0 32px @button-alt;
+    0 0 32px @login-button-alt;
 }
 
-.login-box a span {
+.form-box a span {
   position: absolute;
   display: block;
 }
 
-.login-box a span:nth-child(1) {
+.form-box a span:nth-child(1) {
   top: 0;
   left: -100%;
   width: 100%;
@@ -197,7 +487,7 @@ export default {
   }
 }
 
-.login-box a span:nth-child(2) {
+.form-box a span:nth-child(2) {
   top: -100%;
   right: 0;
   width: 2px;
@@ -217,7 +507,7 @@ export default {
   }
 }
 
-.login-box a span:nth-child(3) {
+.form-box a span:nth-child(3) {
   bottom: 0;
   right: -100%;
   width: 100%;
@@ -237,7 +527,7 @@ export default {
   }
 }
 
-.login-box a span:nth-child(4) {
+.form-box a span:nth-child(4) {
   bottom: -100%;
   left: 0;
   width: 2px;

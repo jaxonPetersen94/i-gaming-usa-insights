@@ -1,0 +1,43 @@
+{
+  "folders": [
+    {
+      "path": "."
+    }
+  ],
+  "tasks": {
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "Create Terminals",
+        "dependsOn": ["Git", "Frontend", "Backend"],
+        "runOptions": {
+          "runOn": "folderOpen"
+        }
+      },
+      {
+        "label": "Git",
+        "command": "C:\\Program Files\\Git\\bin\\bash.exe",
+        "isBackground": true,
+        "args": ["--login", "-i"]
+      },
+      {
+        "label": "Frontend",
+        "command": "C:\\Program Files\\Git\\bin\\bash.exe",
+        "isBackground": true,
+        "options": {
+          "cwd": "${workspaceRoot}/Frontend"
+        },
+        "args": ["--login", "-i"]
+      },
+      {
+        "label": "Backend",
+        "command": "C:\\Program Files\\Git\\bin\\bash.exe",
+        "isBackground": true,
+        "options": {
+          "cwd": "${workspaceRoot}/Backend"
+        },
+        "args": ["--login", "-i"]
+      }
+    ]
+  }
+}

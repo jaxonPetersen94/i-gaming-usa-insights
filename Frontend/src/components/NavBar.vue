@@ -1,23 +1,21 @@
 <template>
-    <div>
-      <nav>
-        <ul>
-          <li><a href="#">Home</a></li>
-          <li><a href="#">About</a></li>
-          <li><a href="#">Services</a></li>
-          <li><a href="#">Contact</a></li>
-        </ul>
-      </nav>
-    </div>
-  </template>
-  
-  <script>
-  export default {
-    // Your component's logic goes here
-  }
-  </script>
-  
-  <style scoped lang="css">
-  /* Your component-specific styles go here */
-  </style>
-  
+  <nav></nav>
+</template>
+
+<script>
+export default {
+  // Your component's logic goes here
+};
+</script>
+
+<style scoped lang="less">
+@import '../variables.less';
+
+nav {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  background-color: @navbar-background;
+  height: 80px;
+}
+</style>

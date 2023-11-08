@@ -1,12 +1,16 @@
 <template>
-  <div>
-    <router-view></router-view>
-  </div>
+  <!-- <NavBar /> -->
+  <router-view></router-view>
 </template>
 
 <script>
+import NavBar from './components/NavBar.vue';
+
 export default {
   name: 'iGamingUSA-Insights',
+  components: {
+    NavBar,
+  },
 };
 </script>
 
@@ -18,8 +22,6 @@ export default {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
 }
 
 html {
@@ -30,5 +32,9 @@ html {
   );
   background-size: 100% 100%;
   background-attachment: fixed;
+}
+
+body {
+  margin: 0;
 }
 </style>
