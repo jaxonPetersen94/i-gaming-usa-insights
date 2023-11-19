@@ -3,9 +3,7 @@
 </template>
 
 <script>
-export default {
-  // Your component's logic goes here
-};
+export default {};
 </script>
 
 <style scoped lang="less">

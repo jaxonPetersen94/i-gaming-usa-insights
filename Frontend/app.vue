@@ -1,30 +1,17 @@
 <template>
-  <!-- <NavBar /> -->
-  <router-view></router-view>
+  <div>
+    <NuxtPage />
+  </div>
 </template>
-
-<script>
-import NavBar from './components/NavBar.vue';
-
-export default {
-  name: 'iGamingUSA-Insights',
-  components: {
-    NavBar,
-  },
-};
-</script>
 
 <style lang="less">
 @import './variables.less';
 
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
+html {
+  font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-}
 
-html {
   background: linear-gradient(
     to bottom right,
     @background-light,

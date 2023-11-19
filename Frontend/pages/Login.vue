@@ -3,67 +3,100 @@
     <div class="form-box-title">
       <h2 ref="formTitleText" class="form-title-text">{{ formType }}</h2>
       <h2 @mouseup="toggleFormType" class="opposite-form-text">
-        {{ oppositeFormType }}?
+        {{ getOppositeFormTypeText }}?
       </h2>
     </div>
-    <form>
+    <Form class="veeValidateForm">
       <div
         class="inputs-container"
         :class="{
-          'inputs-container-override': toggledRegisterForm,
-          'inputs-container-final': displayRegisterInputs,
+          'inputs-container-override': formTypeIsRegister,
+          'inputs-container-final': landedAtRegisterPage,
         }"
       >
         <div
           class="input-box"
           :class="{
-            'input-box-register-first': !displayRegisterInputs,
+            'input-box-register-first': !landedAtRegisterPage,
             'input-box-register-first-override':
-              toggledRegisterForm && !displayRegisterInputs,
+              formTypeIsRegister && !landedAtRegisterPage,
           }"
         >
-          <input type="text" name="" required="" />
+          <Field
+            name="firstName"
+            type="text"
+            class="inputField"
+            v-model="registerFormData.firstName"
+            required
+          />
           <label>First Name</label>
         </div>
         <div
           class="input-box"
           :class="{
-            'input-box-register': !displayRegisterInputs,
+            'input-box-register': !landedAtRegisterPage,
             'input-box-register-override':
-              toggledRegisterForm && !displayRegisterInputs,
+              formTypeIsRegister && !landedAtRegisterPage,
           }"
         >
-          <input type="text" name="" required="" />
+          <Field
+            name="lastName"
+            type="text"
+            class="inputField"
+            v-model="registerFormData.lastName"
+            required
+          />
           <label>Last Name</label>
         </div>
         <div class="input-box">
-          <input type="text" name="" required="" />
+          <Field
+            name="email"
+            type="text"
+            class="inputField"
+            :rules="validateEmail"
+            :value="getUsernameOrEmailValue"
+            @input="updateUsernameEmail"
+            required
+          />
           <label ref="usernameEmailText">
             {{ usernameOrEmail }}
           </label>
         </div>
         <div class="input-box">
-          <input type="password" name="" required="" />
+          <Field
+            name="password"
+            type="password"
+            class="inputField"
+            :value="getPasswordValue"
+            @input="updatePassword"
+            required
+          />
           <label>Password</label>
         </div>
         <div
           class="input-box"
           :class="{
-            'input-box-register-last': !displayRegisterInputs,
+            'input-box-register-last': !landedAtRegisterPage,
             'input-box-register-last-override':
-              toggledRegisterForm && !displayRegisterInputs,
-            'input-box-register-last-final': displayRegisterInputs,
+              formTypeIsRegister && !landedAtRegisterPage,
+            'input-box-register-last-final': landedAtRegisterPage,
           }"
         >
-          <input type="password" name="" required="" />
+          <Field
+            name="confirmPassword"
+            type="password"
+            class="inputField"
+            v-model="registerFormData.confirmPassword"
+            required
+          />
           <label>Confirm Password</label>
         </div>
       </div>
       <div
         class="submit-forgot-container"
         :class="{
-          'submit-forgot-container-override': toggledRegisterForm,
-          'submit-forgot-container-final': displayRegisterInputs,
+          'submit-forgot-container-override': formTypeIsRegister,
+          'submit-forgot-container-final': landedAtRegisterPage,
         }"
       >
         <div class="submit-btn-container">
@@ -79,42 +112,62 @@
         <span
           class="forgot-password"
           :class="{
-            'forgot-password-fade-out': toggledRegisterForm,
+            'forgot-password-fade-out': formTypeIsRegister,
             'forgot-password-fade-in': shouldFadeInForgotPassword,
           }"
           >Forgot password?</span
         >
       </div>
-    </form>
+    </Form>
   </div>
 </template>
 
-<script>
-import { ref, onMounted } from 'vue';
-import Preloader from '../components/Preloader.vue';
-import { UserStore } from '@/stores/UserStore';
-import TextScramble from '../utilities/TextScrambler';
+<script lang="ts">
+import { ref, onMounted, computed } from 'vue';
+import Preloader from '@/components/Preloader.vue';
+import TextScramble from '@/utilities/TextScrambler';
+import type {
+  RegisterUserForm,
+  RegisterUserPostRequest,
+  SignInUserForm,
+} from '@/types/User/types';
+import { Form, Field, ErrorMessage } from 'vee-validate';
 
 export default {
   components: {
     Preloader,
+    Form,
+    Field,
   },
   setup() {
-    const formBox = ref(null);
-    const submitButton = ref(null);
-    const formTitleText = ref(null);
-    const usernameEmailText = ref(null);
+    const formBox = ref<HTMLElement | null>(null);
+    const submitButton = ref<HTMLElement | null>(null);
+    const formTitleText = ref<HTMLElement | null>(null);
+    const usernameEmailText = ref<HTMLElement | null>(null);
 
     const formType = ref('Login');
     const usernameOrEmail = ref('Username');
-    const loginProcessing = ref(false);
-    const formTransitionOccuring = ref(false);
-    const displayRegisterInputs = ref(false);
 
+    const formTransitionOccuring = ref(false);
+    const landedAtRegisterPage = ref(false);
+    const landedAtLoginPage = ref(false);
     const registerPageVisited = ref(false);
 
-    let formTitleTextScramble;
-    let usernameEmailTextScramble;
+    const signInFormData = ref<SignInUserForm>({
+      username: '',
+      password: '',
+    });
+
+    const registerFormData = ref<RegisterUserForm>({
+      firstName: '',
+      lastName: '',
+      email: '',
+      password: '',
+      confirmPassword: '',
+    });
+
+    let formTitleTextScramble: TextScramble;
+    let usernameEmailTextScramble: TextScramble;
 
     onMounted(() => {
       if (formTitleText.value) {
@@ -127,7 +180,6 @@ export default {
 
     const toggleFormType = () => {
       if (!registerPageVisited.value) {
-        console.log('asopdjawioqjdc');
         registerPageVisited.value = true;
       }
 
@@ -145,7 +197,7 @@ export default {
           if (formType.value === 'Register') {
             formBox.value.classList.add('register-override');
           } else {
-            displayRegisterInputs.value = false;
+            landedAtRegisterPage.value = false;
             formBox.value.classList.remove('register-override');
           }
           formBox.value.addEventListener('transitionend', handleTransitionEnd);
@@ -153,36 +205,112 @@ export default {
       }
     };
 
-    const handleTransitionEnd = (event) => {
-      if (event.target === formBox.value) {
+    const handleTransitionEnd = (event: any) => {
+      if (formBox.value && event.target === formBox.value) {
         formTransitionOccuring.value = false;
         if (formType.value === 'Register') {
-          displayRegisterInputs.value = true;
+          landedAtRegisterPage.value = true;
+          landedAtLoginPage.value = false;
+        } else {
+          landedAtLoginPage.value = true;
         }
         formBox.value.removeEventListener('transitionend', handleTransitionEnd);
       }
     };
 
-    const applyScrambleTextEffect = (textScrambleInstance, newText) => {
+    const applyScrambleTextEffect = (
+      textScrambleInstance: TextScramble,
+      newText: string,
+    ) => {
       if (textScrambleInstance) {
         textScrambleInstance.setText(newText);
       }
     };
 
-    const handleSubmit = async () => {
-      if (submitButton.value) {
-        submitButton.value.classList.add('submit-btn-animate-out');
-        submitButton.value.addEventListener(
-          'transitionend',
-          () => {
-            submitButton.value.classList.remove('submit-btn-animate-out');
-            loginProcessing.value = true;
-          },
-          { once: true },
-        );
-        const userStore = UserStore();
-        userStore.signInUser();
+    const handleSubmit = async (values: any) => {
+      // if (submitButton.value) {
+      //   console.log('values =', values);
+      //   submitButton.value.classList.add('submit-btn-animate-out');
+      //   submitButton.value.addEventListener(
+      //     'transitionend',
+      //     () => {
+      //       submitButton.value!.classList.remove('submit-btn-animate-out');
+      //       store.state.user.loginProcessing = true;
+      //     },
+      //     { once: true },
+      //   );
+      //   if (formType.value === 'Register') {
+      //     const newUser: RegisterUserPostRequest = {
+      //       firstName: registerFormData.value.firstName,
+      //       lastName: registerFormData.value.lastName,
+      //       email: registerFormData.value.email,
+      //       password: registerFormData.value.password,
+      //     };
+      //     store.dispatch('registerUser', newUser);
+      //   } else {
+      //     store.dispatch('signInUser', signInFormData.value);
+      //   }
+      // }
+    };
+
+    const formTypeIsRegister = computed(() => {
+      return formType.value === 'Register';
+    });
+
+    const shouldFadeInForgotPassword = computed(() => {
+      return (
+        formType.value === 'Login' &&
+        registerPageVisited.value &&
+        !landedAtLoginPage.value
+      );
+    });
+
+    const loginProcessing = computed(() => {
+      // return store.state.user.loginProcessing;
+      return false;
+    });
+
+    const getOppositeFormTypeText = computed(() => {
+      return formType.value === 'Login' ? 'Register' : 'Login';
+    });
+
+    const getUsernameOrEmailValue = computed(() =>
+      formTypeIsRegister.value
+        ? registerFormData.value.email
+        : signInFormData.value.username,
+    );
+
+    const getPasswordValue = computed(() =>
+      formTypeIsRegister.value
+        ? registerFormData.value.password
+        : signInFormData.value.password,
+    );
+
+    const updateUsernameEmail = (event: any) => {
+      if (formTypeIsRegister.value) {
+        registerFormData.value.email = event.target.value;
+      } else {
+        signInFormData.value.username = event.target.value;
       }
+    };
+
+    const updatePassword = (event: any) => {
+      if (formTypeIsRegister.value) {
+        registerFormData.value.password = event.target.value;
+      } else {
+        signInFormData.value.password = event.target.value;
+      }
+    };
+
+    const validateEmail = (value: any) => {
+      if (!value) {
+        return 'This field is required';
+      }
+      const regex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i;
+      if (!regex.test(value)) {
+        return 'This field must be a valid email';
+      }
+      return true;
     };
 
     return {
@@ -192,24 +320,24 @@ export default {
       usernameEmailText,
       formType,
       usernameOrEmail,
-      loginProcessing,
       formTransitionOccuring,
-      displayRegisterInputs,
+      landedAtRegisterPage,
+      landedAtLoginPage,
       registerPageVisited,
+      signInFormData,
+      registerFormData,
       toggleFormType,
       handleSubmit,
+      formTypeIsRegister,
+      shouldFadeInForgotPassword,
+      loginProcessing,
+      getOppositeFormTypeText,
+      getUsernameOrEmailValue,
+      getPasswordValue,
+      updateUsernameEmail,
+      updatePassword,
+      validateEmail,
     };
-  },
-  computed: {
-    oppositeFormType() {
-      return this.formType === 'Login' ? 'Register' : 'Login';
-    },
-    shouldFadeInForgotPassword() {
-      return this.formType === 'Login' && this.registerPageVisited;
-    },
-    toggledRegisterForm() {
-      return this.formType === 'Register';
-    },
   },
 };
 </script>
@@ -299,7 +427,7 @@ export default {
   }
 }
 
-form {
+.veeValidateForm {
   display: flex;
   flex-direction: column;
   flex: 1;
@@ -326,9 +454,7 @@ form {
   margin-top: auto;
   height: 95px;
   margin-bottom: 40px;
-  transition:
-    margin-bottom 0.7s ease-in-out,
-    height 0.7s ease-in-out;
+  transition: margin-bottom 0.7s ease-in-out, height 0.7s ease-in-out;
 
   &-override {
     margin-bottom: 0px;
@@ -346,7 +472,7 @@ form {
 
 .submit-btn-animate-out {
   opacity: 0;
-  transform: scale(1);
+  transition: opacity 0.3s, transform 0.3s !important;
   pointer-events: none;
 }
 
@@ -360,9 +486,11 @@ form {
 
   &:hover {
     opacity: 100%;
+    transition: opacity 0.3s ease-in-out !important;
   }
 
   &-fade-out {
+    pointer-events: none;
     transition: opacity 0.35s ease-in-out;
     opacity: 0;
   }
@@ -370,7 +498,6 @@ form {
   &-fade-in {
     transition: opacity 0.35s ease-in-out !important;
     transition-delay: 0.3s !important;
-    opacity: 1 !important;
   }
 }
 
@@ -378,7 +505,8 @@ form {
   position: relative;
   user-select: none;
 
-  input {
+  .inputField {
+    display: block;
     width: 100%;
     padding: 10px 0;
     font-size: 16px;
@@ -444,8 +572,8 @@ form {
   }
 }
 
-.form-box .input-box input:focus ~ label,
-.form-box .input-box input:valid ~ label {
+.inputField:focus ~ label,
+.inputField:valid ~ label {
   top: -20px;
   left: 0;
   color: @login-button;
@@ -456,11 +584,8 @@ form {
   background: @login-button;
   color: @white;
   border-radius: 5px;
-  box-shadow:
-    0 0 4px @login-button,
-    0 0 8px @login-button,
-    0 0 16px @login-button,
-    0 0 32px @login-button-alt;
+  box-shadow: 0 0 4px @login-button, 0 0 8px @login-button,
+    0 0 16px @login-button, 0 0 32px @login-button-alt;
 }
 
 .form-box a span {
@@ -547,3 +672,4 @@ form {
   }
 }
 </style>
+@/stores/UserStore/userStore

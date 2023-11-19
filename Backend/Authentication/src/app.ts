@@ -1,12 +1,22 @@
-import express, { Request, Response } from 'express';
+import express from 'express';
+import https from 'https';
+import fs from 'fs';
+import cors from 'cors';
+import authenticationRoutes from './routes/Auth.js';
 
 const app = express();
 const port = process.env.PORT || 5000;
+const options = {
+  key: fs.readFileSync('./certs/development/key.pem'),
+  cert: fs.readFileSync('./certs/development/cert.pem'),
+};
 
-app.get('/', (req: Request, res: Response) => {
-  res.send('Hello, Typescript Node.js server!');
-});
+app.use(cors());
+app.use(express.json());
+app.use(authenticationRoutes);
 
-app.listen(port, () => {
+const server = https.createServer(options, app);
+
+server.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });

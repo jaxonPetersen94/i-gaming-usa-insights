@@ -1,24 +1,66 @@
-# i-gaming-usa-insights
+## Setup
+Make sure to install the dependencies:
 
-## Project setup
-```
+```bash
+# npm
 npm install
+
+# pnpm
+pnpm install
+
+# yarn
+yarn install
+
+# bun
+bun install
 ```
 
-### Compiles and hot-reloads for development
-```
-npm run serve
+## Development Server
+Start the development server on `http://localhost:3000`:
+
+```bash
+# npm
+npm run dev
+
+# pnpm
+pnpm run dev
+
+# yarn
+yarn dev
+
+# bun
+bun run dev
 ```
 
-### Compiles and minifies for production
-```
+## Production
+Build the application for production:
+
+```bash
+# npm
 npm run build
+
+# pnpm
+pnpm run build
+
+# yarn
+yarn build
+
+# bun
+bun run build
 ```
 
-### Lints and fixes files
-```
-npm run lint
-```
+Locally preview production build:
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+```bash
+# npm
+npm run preview
+
+# pnpm
+pnpm run preview
+
+# yarn
+yarn preview
+
+# bun
+bun run preview
+```
