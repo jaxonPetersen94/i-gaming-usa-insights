@@ -132,6 +132,7 @@ import type {
   SignInUserForm,
 } from '@/types/User/types';
 import { Form, Field, ErrorMessage } from 'vee-validate';
+import { useUserStore } from '../stores/store';
 
 export default {
   components: {
@@ -152,6 +153,8 @@ export default {
     const landedAtRegisterPage = ref(false);
     const landedAtLoginPage = ref(false);
     const registerPageVisited = ref(false);
+
+    const userStore = useUserStore();
 
     const signInFormData = ref<SignInUserForm>({
       username: '',
@@ -228,29 +231,27 @@ export default {
     };
 
     const handleSubmit = async (values: any) => {
-      // if (submitButton.value) {
-      //   console.log('values =', values);
-      //   submitButton.value.classList.add('submit-btn-animate-out');
-      //   submitButton.value.addEventListener(
-      //     'transitionend',
-      //     () => {
-      //       submitButton.value!.classList.remove('submit-btn-animate-out');
-      //       store.state.user.loginProcessing = true;
-      //     },
-      //     { once: true },
-      //   );
-      //   if (formType.value === 'Register') {
-      //     const newUser: RegisterUserPostRequest = {
-      //       firstName: registerFormData.value.firstName,
-      //       lastName: registerFormData.value.lastName,
-      //       email: registerFormData.value.email,
-      //       password: registerFormData.value.password,
-      //     };
-      //     store.dispatch('registerUser', newUser);
-      //   } else {
-      //     store.dispatch('signInUser', signInFormData.value);
-      //   }
-      // }
+      if (submitButton.value) {
+        submitButton.value.classList.add('submit-btn-animate-out');
+        submitButton.value.addEventListener(
+          'transitionend',
+          () => {
+            submitButton.value!.classList.remove('submit-btn-animate-out');
+          },
+          { once: true },
+        );
+        if (formType.value === 'Register') {
+          const newUser: RegisterUserPostRequest = {
+            firstName: registerFormData.value.firstName,
+            lastName: registerFormData.value.lastName,
+            email: registerFormData.value.email,
+            password: registerFormData.value.password,
+          };
+          userStore.registerUser(newUser);
+        } else {
+          userStore.signInUser(signInFormData.value);
+        }
+      }
     };
 
     const formTypeIsRegister = computed(() => {
@@ -266,8 +267,7 @@ export default {
     });
 
     const loginProcessing = computed(() => {
-      // return store.state.user.loginProcessing;
-      return false;
+      return userStore.loginProcessing;
     });
 
     const getOppositeFormTypeText = computed(() => {
@@ -454,7 +454,9 @@ export default {
   margin-top: auto;
   height: 95px;
   margin-bottom: 40px;
-  transition: margin-bottom 0.7s ease-in-out, height 0.7s ease-in-out;
+  transition:
+    margin-bottom 0.7s ease-in-out,
+    height 0.7s ease-in-out;
 
   &-override {
     margin-bottom: 0px;
@@ -472,7 +474,9 @@ export default {
 
 .submit-btn-animate-out {
   opacity: 0;
-  transition: opacity 0.3s, transform 0.3s !important;
+  transition:
+    opacity 0.3s,
+    transform 0.3s !important;
   pointer-events: none;
 }
 
@@ -584,8 +588,11 @@ export default {
   background: @login-button;
   color: @white;
   border-radius: 5px;
-  box-shadow: 0 0 4px @login-button, 0 0 8px @login-button,
-    0 0 16px @login-button, 0 0 32px @login-button-alt;
+  box-shadow:
+    0 0 4px @login-button,
+    0 0 8px @login-button,
+    0 0 16px @login-button,
+    0 0 32px @login-button-alt;
 }
 
 .form-box a span {

@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { defineStore } from 'pinia';
 import type { RegisterUserPostRequest } from '../types/User/types';
 
@@ -7,32 +6,51 @@ export const useUserStore = defineStore('user', () => {
   const loginProcessing = ref(false);
   const loginSuccessful = ref(false);
 
-  function registerUser(newUser: RegisterUserPostRequest) {
+  async function registerUser(newUser: RegisterUserPostRequest) {
     loginProcessing.value = true;
-    axios
-      .post('https://localhost:5000/api/register', newUser)
-      .then(() => {
-        loginSuccessful.value = true;
-      })
-      .catch((error) => {
-        console.error('Error:', error);
-      })
-      .finally(() => {
-        loginProcessing.value = false;
-      });
+
+    const CONSTS_API_USER_REGISTER = 'https://localhost:5000/api/register';
+    const { error, data: responseData } = await useFetch(
+      CONSTS_API_USER_REGISTER,
+      {
+        method: 'post',
+        body: newUser,
+      },
+    );
+
+    if (error) {
+      loginSuccessful.value = false;
+      console.log('register error =', error);
+    } else {
+      loginSuccessful.value = true;
+      console.log('responseData =', responseData);
+    }
+
+    loginProcessing.value = false;
   }
 
-  function signInUser(user: any) {
-    axios
-      .post('https://localhost:5000/api/login', user)
-      .then((response) => {
-        console.log('Successfully signed into User!');
-        console.log('Response:', response.data);
-      })
-      .catch((error) => {
-        console.error('Error:', error);
-      });
+  async function signInUser(user: any) {
+    loginProcessing.value = true;
+
+    const CONSTS_API_USER_LOGIN = 'https://localhost:5000/api/register';
+    const { error, data: responseData } = await useFetch(
+      CONSTS_API_USER_LOGIN,
+      {
+        method: 'get',
+        body: user,
+      },
+    );
+
+    if (error) {
+      loginSuccessful.value = false;
+      console.log('login error =', error);
+    } else {
+      loginSuccessful.value = true;
+      console.log('responseData =', responseData);
+    }
+
+    loginProcessing.value = false;
   }
 
-  return { user, loginProcessing, loginSuccessful, registerUser };
+  return { user, loginProcessing, loginSuccessful, registerUser, signInUser };
 });
