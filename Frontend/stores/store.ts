@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import type { RegisterUserPostRequest } from '../types/User/types';
+import APP_CONST from '~/constants/appConstants';
 
 export const useUserStore = defineStore('user', () => {
   const user = ref(0);
@@ -9,9 +10,8 @@ export const useUserStore = defineStore('user', () => {
   async function registerUser(newUser: RegisterUserPostRequest) {
     loginProcessing.value = true;
 
-    const CONSTS_API_USER_REGISTER = 'https://localhost:5000/api/register';
     const { error, data: responseData } = await useFetch(
-      CONSTS_API_USER_REGISTER,
+      APP_CONST.API_USER_REGISTER,
       {
         method: 'post',
         body: newUser,
@@ -32,9 +32,8 @@ export const useUserStore = defineStore('user', () => {
   async function signInUser(user: any) {
     loginProcessing.value = true;
 
-    const CONSTS_API_USER_LOGIN = 'https://localhost:5000/api/register';
     const { error, data: responseData } = await useFetch(
-      CONSTS_API_USER_LOGIN,
+      APP_CONST.API_USER_LOGIN,
       {
         method: 'get',
         body: user,
