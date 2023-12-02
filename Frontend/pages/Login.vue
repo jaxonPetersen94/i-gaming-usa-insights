@@ -26,7 +26,7 @@
             name="firstName"
             type="text"
             class="inputField"
-            v-model="registerFormData.firstName"
+            v-model="formData.firstName"
             required
           />
           <label>First Name</label>
@@ -43,7 +43,7 @@
             name="lastName"
             type="text"
             class="inputField"
-            v-model="registerFormData.lastName"
+            v-model="formData.lastName"
             required
           />
           <label>Last Name</label>
@@ -54,7 +54,7 @@
             type="text"
             class="inputField"
             :rules="validateEmail"
-            :value="getUsernameOrEmailValue"
+            :value="formData.email"
             @input="updateUsernameEmail"
             required
           />
@@ -67,7 +67,7 @@
             name="password"
             type="password"
             class="inputField"
-            :value="getPasswordValue"
+            :value="formData.password"
             @input="updatePassword"
             required
           />
@@ -86,7 +86,7 @@
             name="confirmPassword"
             type="password"
             class="inputField"
-            v-model="registerFormData.confirmPassword"
+            v-model="formData.confirmPassword"
             required
           />
           <label>Confirm Password</label>
@@ -156,12 +156,7 @@ export default {
 
     const userStore = useUserStore();
 
-    const signInFormData = ref<SignInUserForm>({
-      username: '',
-      password: '',
-    });
-
-    const registerFormData = ref<RegisterUserForm>({
+    const formData = ref<RegisterUserForm>({
       firstName: '',
       lastName: '',
       email: '',
@@ -241,15 +236,9 @@ export default {
           { once: true },
         );
         if (formType.value === 'Register') {
-          const newUser: RegisterUserPostRequest = {
-            firstName: registerFormData.value.firstName,
-            lastName: registerFormData.value.lastName,
-            email: registerFormData.value.email,
-            password: registerFormData.value.password,
-          };
-          userStore.registerUser(newUser);
+          userStore.registerUser(formData.value);
         } else {
-          userStore.signInUser(signInFormData.value);
+          userStore.signInUser(formData.value);
         }
       }
     };
@@ -274,32 +263,12 @@ export default {
       return formType.value === 'Login' ? 'Register' : 'Login';
     });
 
-    const getUsernameOrEmailValue = computed(() =>
-      formTypeIsRegister.value
-        ? registerFormData.value.email
-        : signInFormData.value.username,
-    );
-
-    const getPasswordValue = computed(() =>
-      formTypeIsRegister.value
-        ? registerFormData.value.password
-        : signInFormData.value.password,
-    );
-
     const updateUsernameEmail = (event: any) => {
-      if (formTypeIsRegister.value) {
-        registerFormData.value.email = event.target.value;
-      } else {
-        signInFormData.value.username = event.target.value;
-      }
+      formData.value.email = event.target.value;
     };
 
     const updatePassword = (event: any) => {
-      if (formTypeIsRegister.value) {
-        registerFormData.value.password = event.target.value;
-      } else {
-        signInFormData.value.password = event.target.value;
-      }
+      formData.value.password = event.target.value;
     };
 
     const validateEmail = (value: any) => {
@@ -324,16 +293,13 @@ export default {
       landedAtRegisterPage,
       landedAtLoginPage,
       registerPageVisited,
-      signInFormData,
-      registerFormData,
+      formData,
       toggleFormType,
       handleSubmit,
       formTypeIsRegister,
       shouldFadeInForgotPassword,
       loginProcessing,
       getOppositeFormTypeText,
-      getUsernameOrEmailValue,
-      getPasswordValue,
       updateUsernameEmail,
       updatePassword,
       validateEmail,
@@ -521,6 +487,11 @@ export default {
     outline: none;
     background: transparent;
     cursor: default;
+
+    &:-webkit-autofill {
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: @white !important;
+    }
   }
 
   label {

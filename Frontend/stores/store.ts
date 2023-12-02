@@ -9,45 +9,33 @@ export const useUserStore = defineStore('user', () => {
 
   async function registerUser(newUser: RegisterUserPostRequest) {
     loginProcessing.value = true;
-
-    const { error, data: responseData } = await useFetch(
-      APP_CONST.API_USER_REGISTER,
-      {
-        method: 'post',
-        body: newUser,
-      },
-    );
-
-    if (error) {
+    const data = await $fetch(APP_CONST.API_USER_REGISTER, {
+      method: 'post',
+      body: newUser,
+    }).catch((error) => {
       loginSuccessful.value = false;
       console.log('register error =', error);
-    } else {
+    });
+    if (data) {
       loginSuccessful.value = true;
-      console.log('responseData =', responseData);
+      console.log('data =', data);
     }
-
     loginProcessing.value = false;
   }
 
   async function signInUser(user: any) {
     loginProcessing.value = true;
-
-    const { error, data: responseData } = await useFetch(
-      APP_CONST.API_USER_LOGIN,
-      {
-        method: 'get',
-        body: user,
-      },
-    );
-
-    if (error) {
+    const data = await $fetch(APP_CONST.API_USER_LOGIN, {
+      method: 'post',
+      body: user,
+    }).catch((error) => {
       loginSuccessful.value = false;
       console.log('login error =', error);
-    } else {
+    });
+    if (data) {
       loginSuccessful.value = true;
-      console.log('responseData =', responseData);
+      console.log('data =', data);
     }
-
     loginProcessing.value = false;
   }
 
