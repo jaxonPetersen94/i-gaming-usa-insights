@@ -724,9 +724,14 @@ export default {
 }
 
 .forgot-password-instructions-text {
+  position: absolute;
+  left: 0;
+  right: 0;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 104px;
+  width: 282px;
   color: white;
-  text-align: center;
-  margin-bottom: 32px;
   opacity: 0;
   transition: opacity 0.35s;
 
