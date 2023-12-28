@@ -56,7 +56,26 @@
           />
           <label>Last Name</label>
         </div>
-        <div class="input-box">
+        <span
+          class="forgot-password-instructions-text"
+          :class="{
+            'forgot-password-instructions-text-fade-in':
+              passwordBoxIsHidden && formType === 'Forgot Password',
+          }"
+        >
+          Please enter the email you use to login.
+        </span>
+        <div
+          ref="usernameEmailInputBox"
+          class="input-box"
+          :class="{
+            'input-box-email-slide-down': formTypeIsForgotPassword,
+            'input-box-email-slide-down-final':
+              formTypeIsForgotPassword && passwordBoxIsHidden,
+            'input-box-email-slide-up':
+              !formTypeIsForgotPassword && forgotPasswordPageVisited,
+          }"
+        >
           <Field
             name="email"
             type="text"
@@ -70,7 +89,12 @@
             {{ usernameOrEmail }}
           </label>
         </div>
-        <div class="input-box">
+        <div
+          v-if="!passwordBoxIsHidden"
+          ref="passwordInputBox"
+          class="input-box"
+          :class="{ 'input-box-password-fade-out': formTypeIsForgotPassword }"
+        >
           <Field
             name="password"
             type="password"
@@ -156,6 +180,7 @@ export default {
     const formTitleText = ref<HTMLElement | null>(null);
     const oppositeFormText = ref<HTMLElement | null>(null);
     const usernameEmailText = ref<HTMLElement | null>(null);
+    const usernameEmailInputBox = ref<HTMLElement | null>(null);
 
     const formType = ref('Login');
     const usernameOrEmail = ref('Username');
@@ -166,6 +191,7 @@ export default {
     const landedAtLoginPage = ref(false);
     const registerPageVisited = ref(false);
     const forgotPasswordPageVisited = ref(false);
+    const passwordBoxIsHidden = ref(false);
 
     const userStore = useUserStore();
 
@@ -254,11 +280,22 @@ export default {
           usernameEmailTextScramble,
           usernameOrEmail.value,
         );
-        if (oppositeFormText.value && formType.value === 'Login') {
+
+        const validFormType =
+          formType.value === 'Login' || formType.value === 'Forgot Password';
+        if (
+          oppositeFormText.value &&
+          usernameEmailInputBox.value &&
+          validFormType
+        ) {
           formTransitionOccuring.value = true;
           oppositeFormText.value.addEventListener(
             'transitionend',
             handleTransitionEnd_OppositeFormText,
+          );
+          usernameEmailInputBox.value.addEventListener(
+            'transitionend',
+            handleTransitionEnd_UsernameEmailInputBox,
           );
         }
       }
@@ -266,7 +303,6 @@ export default {
 
     const handleTransitionEnd_OppositeFormText = (event: any) => {
       if (oppositeFormText.value && event.target === oppositeFormText.value) {
-        formTransitionOccuring.value = false;
         if (formType.value === 'Forgot Password') {
           landedAtLoginPage.value = false;
         } else {
@@ -275,6 +311,27 @@ export default {
         oppositeFormText.value.removeEventListener(
           'transitionend',
           handleTransitionEnd_OppositeFormText,
+        );
+      }
+    };
+
+    const handleTransitionEnd_UsernameEmailInputBox = (event: any) => {
+      if (
+        usernameEmailInputBox.value &&
+        event.target === usernameEmailInputBox.value
+      ) {
+        formTransitionOccuring.value = false;
+        if (formType.value === 'Forgot Password') {
+          passwordBoxIsHidden.value = true;
+        } else {
+          passwordBoxIsHidden.value = false;
+          usernameEmailInputBox.value.classList.add(
+            'input-box-email-slide-up-final',
+          );
+        }
+        usernameEmailInputBox.value.removeEventListener(
+          'transitionend',
+          handleTransitionEnd_UsernameEmailInputBox,
         );
       }
     };
@@ -359,6 +416,7 @@ export default {
       formTitleText,
       oppositeFormText,
       usernameEmailText,
+      usernameEmailInputBox,
       formType,
       usernameOrEmail,
       forgotPasswordText,
@@ -366,6 +424,8 @@ export default {
       landedAtRegisterPage,
       landedAtLoginPage,
       registerPageVisited,
+      forgotPasswordPageVisited,
+      passwordBoxIsHidden,
       formData,
       toggleFormType,
       toggleForgotPassword,
@@ -560,6 +620,8 @@ export default {
 .form-box .input-box {
   position: relative;
   user-select: none;
+  transition: opacity 0.7s;
+  transition-delay: 0.35s;
 
   .inputField {
     display: block;
@@ -630,6 +692,46 @@ export default {
     &-final {
       position: relative;
     }
+  }
+
+  &-email-slide-down {
+    transform: translateY(100%);
+    transition: transform 0.7s;
+
+    &-final {
+      transform: translateY(0%);
+      transition: transform 0s;
+    }
+  }
+
+  &-email-slide-up {
+    transform: translateY(-100%);
+    transition: transform 0.7s;
+
+    &-final {
+      transform: translateY(0%);
+      transition: transform 0s;
+    }
+  }
+
+  &-password-fade-out {
+    width: 320px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.35s !important;
+    transition-delay: 0s !important;
+  }
+}
+
+.forgot-password-instructions-text {
+  color: white;
+  text-align: center;
+  margin-bottom: 32px;
+  opacity: 0;
+  transition: opacity 0.35s;
+
+  &-fade-in {
+    opacity: 1;
   }
 }
 
