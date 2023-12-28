@@ -2,7 +2,15 @@
   <div ref="formBox" class="form-box">
     <div class="form-box-title">
       <h2 ref="formTitleText" class="form-title-text">{{ formType }}</h2>
-      <h2 @mouseup="toggleFormType" class="opposite-form-text">
+      <h2
+        ref="oppositeFormText"
+        class="opposite-form-text"
+        :class="{
+          'opposite-form-text-fade-out': formTypeIsForgotPassword,
+          'opposite-form-text-fade-in': shouldFadeInOppositeFormText,
+        }"
+        @mouseup="toggleFormType"
+      >
         {{ getOppositeFormTypeText }}?
       </h2>
     </div>
@@ -115,8 +123,10 @@
             'forgot-password-fade-out': formTypeIsRegister,
             'forgot-password-fade-in': shouldFadeInForgotPassword,
           }"
-          >Forgot password?</span
+          @mouseup="toggleForgotPassword"
         >
+          {{ forgotPasswordText }}?
+        </span>
       </div>
     </Form>
   </div>
@@ -144,15 +154,18 @@ export default {
     const formBox = ref<HTMLElement | null>(null);
     const submitButton = ref<HTMLElement | null>(null);
     const formTitleText = ref<HTMLElement | null>(null);
+    const oppositeFormText = ref<HTMLElement | null>(null);
     const usernameEmailText = ref<HTMLElement | null>(null);
 
     const formType = ref('Login');
     const usernameOrEmail = ref('Username');
+    const forgotPasswordText = ref('Forgot Password');
 
     const formTransitionOccuring = ref(false);
     const landedAtRegisterPage = ref(false);
     const landedAtLoginPage = ref(false);
     const registerPageVisited = ref(false);
+    const forgotPasswordPageVisited = ref(false);
 
     const userStore = useUserStore();
 
@@ -198,12 +211,15 @@ export default {
             landedAtRegisterPage.value = false;
             formBox.value.classList.remove('register-override');
           }
-          formBox.value.addEventListener('transitionend', handleTransitionEnd);
+          formBox.value.addEventListener(
+            'transitionend',
+            handleTransitionEnd_FormBox,
+          );
         }
       }
     };
 
-    const handleTransitionEnd = (event: any) => {
+    const handleTransitionEnd_FormBox = (event: any) => {
       if (formBox.value && event.target === formBox.value) {
         formTransitionOccuring.value = false;
         if (formType.value === 'Register') {
@@ -212,7 +228,54 @@ export default {
         } else {
           landedAtLoginPage.value = true;
         }
-        formBox.value.removeEventListener('transitionend', handleTransitionEnd);
+        formBox.value.removeEventListener(
+          'transitionend',
+          handleTransitionEnd_FormBox,
+        );
+      }
+    };
+
+    const toggleForgotPassword = () => {
+      if (!forgotPasswordPageVisited.value) {
+        forgotPasswordPageVisited.value = true;
+      }
+
+      if (!formTransitionOccuring.value) {
+        formType.value =
+          formType.value === 'Forgot Password' ? 'Login' : 'Forgot Password';
+        forgotPasswordText.value =
+          forgotPasswordText.value === 'Forgot Password'
+            ? 'Return to Login'
+            : 'Forgot Password';
+        usernameOrEmail.value =
+          usernameOrEmail.value === 'Username' ? 'Email' : 'Username';
+        applyScrambleTextEffect(formTitleTextScramble, formType.value);
+        applyScrambleTextEffect(
+          usernameEmailTextScramble,
+          usernameOrEmail.value,
+        );
+        if (oppositeFormText.value && formType.value === 'Login') {
+          formTransitionOccuring.value = true;
+          oppositeFormText.value.addEventListener(
+            'transitionend',
+            handleTransitionEnd_OppositeFormText,
+          );
+        }
+      }
+    };
+
+    const handleTransitionEnd_OppositeFormText = (event: any) => {
+      if (oppositeFormText.value && event.target === oppositeFormText.value) {
+        formTransitionOccuring.value = false;
+        if (formType.value === 'Forgot Password') {
+          landedAtLoginPage.value = false;
+        } else {
+          landedAtLoginPage.value = true;
+        }
+        oppositeFormText.value.removeEventListener(
+          'transitionend',
+          handleTransitionEnd_OppositeFormText,
+        );
       }
     };
 
@@ -247,6 +310,10 @@ export default {
       return formType.value === 'Register';
     });
 
+    const formTypeIsForgotPassword = computed(() => {
+      return formType.value === 'Forgot Password';
+    });
+
     const shouldFadeInForgotPassword = computed(() => {
       return (
         formType.value === 'Login' &&
@@ -255,12 +322,16 @@ export default {
       );
     });
 
+    const shouldFadeInOppositeFormText = computed(() => {
+      return formType.value === 'Login' && forgotPasswordPageVisited.value;
+    });
+
     const loginProcessing = computed(() => {
       return userStore.loginProcessing;
     });
 
     const getOppositeFormTypeText = computed(() => {
-      return formType.value === 'Login' ? 'Register' : 'Login';
+      return formType.value === 'Register' ? 'Login' : 'Register';
     });
 
     const updateUsernameEmail = (event: any) => {
@@ -286,18 +357,23 @@ export default {
       formBox,
       submitButton,
       formTitleText,
+      oppositeFormText,
       usernameEmailText,
       formType,
       usernameOrEmail,
+      forgotPasswordText,
       formTransitionOccuring,
       landedAtRegisterPage,
       landedAtLoginPage,
       registerPageVisited,
       formData,
       toggleFormType,
+      toggleForgotPassword,
       handleSubmit,
       formTypeIsRegister,
+      formTypeIsForgotPassword,
       shouldFadeInForgotPassword,
+      shouldFadeInOppositeFormText,
       loginProcessing,
       getOppositeFormTypeText,
       updateUsernameEmail,
@@ -380,7 +456,6 @@ export default {
   .opposite-form-text {
     position: absolute;
     right: 0;
-
     font-size: 14px;
     font-weight: normal;
     opacity: 60%;
@@ -389,6 +464,17 @@ export default {
 
     &:hover {
       opacity: 100%;
+    }
+
+    &-fade-in {
+      transition: opacity 0.35s ease-in-out !important;
+      transition-delay: 0.3s !important;
+    }
+
+    &-fade-out {
+      transition: opacity 0.35s ease-in-out;
+      pointer-events: none;
+      opacity: 0;
     }
   }
 }
@@ -459,15 +545,15 @@ export default {
     transition: opacity 0.3s ease-in-out !important;
   }
 
+  &-fade-in {
+    transition: opacity 0.35s ease-in-out !important;
+    transition-delay: 0.3s !important;
+  }
+
   &-fade-out {
     pointer-events: none;
     transition: opacity 0.35s ease-in-out;
     opacity: 0;
-  }
-
-  &-fade-in {
-    transition: opacity 0.35s ease-in-out !important;
-    transition-delay: 0.3s !important;
   }
 }
 
