@@ -70,8 +70,6 @@
           class="input-box"
           :class="{
             'input-box-email-slide-down': formTypeIsForgotPassword,
-            'input-box-email-slide-down-final':
-              formTypeIsForgotPassword && passwordBoxIsHidden,
             'input-box-email-slide-up':
               !formTypeIsForgotPassword && forgotPasswordPageVisited,
           }"
@@ -90,7 +88,6 @@
           </label>
         </div>
         <div
-          v-if="!passwordBoxIsHidden"
           ref="passwordInputBox"
           class="input-box"
           :class="{ 'input-box-password-fade-out': formTypeIsForgotPassword }"
@@ -325,9 +322,6 @@ export default {
           passwordBoxIsHidden.value = true;
         } else {
           passwordBoxIsHidden.value = false;
-          usernameEmailInputBox.value.classList.add(
-            'input-box-email-slide-up-final',
-          );
         }
         usernameEmailInputBox.value.removeEventListener(
           'transitionend',
@@ -697,21 +691,11 @@ export default {
   &-email-slide-down {
     transform: translateY(100%);
     transition: transform 0.7s;
-
-    &-final {
-      transform: translateY(0%);
-      transition: transform 0s;
-    }
   }
 
   &-email-slide-up {
-    transform: translateY(-100%);
+    transform: translateY(0%);
     transition: transform 0.7s;
-
-    &-final {
-      transform: translateY(0%);
-      transition: transform 0s;
-    }
   }
 
   &-password-fade-out {
