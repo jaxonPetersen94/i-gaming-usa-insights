@@ -83,6 +83,7 @@
             @input="updateUsernameEmail"
             required
           />
+          <ErrorMessage name="email" class="form-validation-error-text" />
           <label ref="usernameEmailText">
             {{ usernameOrEmail }}
           </label>
@@ -170,6 +171,7 @@ export default {
     Preloader,
     Form,
     Field,
+    ErrorMessage,
   },
   setup() {
     const formBox = ref<HTMLElement | null>(null);
@@ -715,7 +717,7 @@ export default {
   margin-right: auto;
   margin-bottom: 104px;
   width: 282px;
-  color: white;
+  color: @white;
   opacity: 0;
   transition: opacity 0.35s;
 
@@ -825,5 +827,13 @@ export default {
   100% {
     bottom: 100%;
   }
+}
+
+.form-validation-error-text {
+  color: @validation-error-text;
+  position: absolute;
+  transform: translateY(-100%);
+  width: 100%;
+  text-align: center;
 }
 </style>
