@@ -35,6 +35,7 @@
             type="text"
             class="inputField"
             v-model="formData.firstName"
+            @keypress="handleNameInput"
             required
           />
           <label>First Name</label>
@@ -52,6 +53,7 @@
             type="text"
             class="inputField"
             v-model="formData.lastName"
+            @keypress="handleNameInput"
             required
           />
           <label>Last Name</label>
@@ -78,7 +80,7 @@
             name="email"
             type="text"
             class="inputField"
-            :rules="validateEmail"
+            :rules="validateEmail_Blur"
             :value="formData.email"
             @input="updateUsernameEmail"
             required
@@ -97,10 +99,12 @@
             name="password"
             type="password"
             class="inputField"
+            :rules="validatePassword_Blur"
             :value="formData.password"
             @input="updatePassword"
             required
           />
+          <ErrorMessage name="password" class="form-validation-error-text" />
           <label>Password</label>
         </div>
         <div
@@ -116,8 +120,13 @@
             name="confirmPassword"
             type="password"
             class="inputField"
+            :rules="validateConfirmPassword_Blur"
             v-model="formData.confirmPassword"
             required
+          />
+          <ErrorMessage
+            name="confirmPassword"
+            class="form-validation-error-text"
           />
           <label>Confirm Password</label>
         </div>
@@ -165,6 +174,7 @@ import type {
 } from '@/types/User/types';
 import { Form, Field, ErrorMessage } from 'vee-validate';
 import { useUserStore } from '../stores/store';
+import { compileScript } from 'vue/compiler-sfc';
 
 export default {
   components: {
@@ -395,13 +405,54 @@ export default {
       formData.value.password = event.target.value;
     };
 
-    const validateEmail = (value: any) => {
-      if (!value) {
-        return 'This field is required';
+    const handleNameInput = (event: any) => {
+      let char = String.fromCharCode(event.keyCode);
+      if (/^[A-Za-z']+$/.test(char)) {
+        return true;
+      } else {
+        event.preventDefault();
       }
-      const regex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i;
-      if (!regex.test(value)) {
-        return 'This field must be a valid email';
+    };
+
+    const validateEmail_Blur = (value: any) => {
+      if (!value) {
+        return true;
+      }
+      if (formTypeIsRegister.value) {
+        const regex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i;
+        if (!regex.test(value)) {
+          return 'This field must be a valid email';
+        }
+      }
+      return true;
+    };
+
+    const validatePassword_Blur = (value: any) => {
+      if (!value) {
+        return true;
+      }
+      if (formTypeIsRegister.value) {
+        if (value.length < 8) {
+          return 'Password must be 8 characters or more';
+        }
+        if (!/[A-Z]/.test(value)) {
+          return 'Password must contain uppercase letter';
+        }
+        if (!/[!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]/.test(value)) {
+          return 'Password must contain at least one symbol';
+        }
+      }
+      return true;
+    };
+
+    const validateConfirmPassword_Blur = (value: any) => {
+      if (!value || !formData.value.password) {
+        return true;
+      }
+      if (formTypeIsRegister.value) {
+        if (value !== formData.value.password) {
+          return 'Passwords must match';
+        }
       }
       return true;
     };
@@ -434,7 +485,10 @@ export default {
       getOppositeFormTypeText,
       updateUsernameEmail,
       updatePassword,
-      validateEmail,
+      handleNameInput,
+      validateEmail_Blur,
+      validatePassword_Blur,
+      validateConfirmPassword_Blur,
     };
   },
 };
@@ -720,6 +774,7 @@ export default {
   color: @white;
   opacity: 0;
   transition: opacity 0.35s;
+  z-index: -999;
 
   &-fade-in {
     opacity: 1;
@@ -832,7 +887,7 @@ export default {
 .form-validation-error-text {
   color: @validation-error-text;
   position: absolute;
-  transform: translateY(-100%);
+  transform: translateY(-144%);
   width: 100%;
   text-align: center;
 }
