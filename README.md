@@ -1,6 +1,6 @@
 # i-gaming-usa-insights
 
-USA Gambling Market Analytics/Insights Dashboard! 🚀
+USA Gambling Market Analytics/Insights Dashboard! 🎲📊📈
 
 A web application that provides real-time insights and analytics on the USA gambling market. 
 This project will allow users to explore data related to online casinos, sports bettings, and other forms of iGaming within the USA.
