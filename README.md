@@ -11,3 +11,6 @@ It will utilize Vue.js, Nuxt.js, Pinia, for State Management, Firebase/Firestore
 
 ## Register
 ![SnagIt_Register](https://github.com/jaxonPetersen94/i-gaming-usa-insights/assets/29075938/a21768a5-483a-40d2-bcd6-78a3bdd3674c)
+
+## Forgot Password
+![SnagIt_ForgotPassword](https://github.com/jaxonPetersen94/i-gaming-usa-insights/assets/29075938/89230bbe-8825-407d-a9ec-1f41d5262273)
