@@ -14,7 +14,7 @@
         {{ getOppositeFormTypeText }}?
       </h2>
     </div>
-    <Form class="veeValidateForm">
+    <Form class="veeValidateForm" @submit="handleSubmit">
       <div
         class="inputs-container"
         :class="{
@@ -38,6 +38,7 @@
             @keypress="handleNameInput"
             required
           />
+          <ErrorMessage name="firstName" class="form-validation-error-text" />
           <label>First Name</label>
         </div>
         <div
@@ -56,6 +57,7 @@
             @keypress="handleNameInput"
             required
           />
+          <ErrorMessage name="lastName" class="form-validation-error-text" />
           <label>Last Name</label>
         </div>
         <span
@@ -139,13 +141,13 @@
         }"
       >
         <div class="submit-btn-container">
-          <a v-if="!loginProcessing" ref="submitButton" @mouseup="handleSubmit">
+          <button v-if="!loginProcessing" ref="submitButton">
             <span></span>
             <span></span>
             <span></span>
             <span></span>
             Submit
-          </a>
+          </button>
           <Preloader v-else />
         </div>
         <span
@@ -167,14 +169,9 @@
 import { ref, onMounted, computed } from 'vue';
 import Preloader from '@/components/Preloader.vue';
 import TextScramble from '@/utilities/textScrambler';
-import type {
-  RegisterUserForm,
-  RegisterUserPostRequest,
-  SignInUserForm,
-} from '@/types/User/types';
+import type { RegisterUserForm } from '@/types/User/types';
 import { Form, Field, ErrorMessage } from 'vee-validate';
 import { useUserStore } from '../stores/store';
-import { compileScript } from 'vue/compiler-sfc';
 
 export default {
   components: {
@@ -351,7 +348,7 @@ export default {
       }
     };
 
-    const handleSubmit = async (values: any) => {
+    const handleSubmit = async (values: any, actions: any) => {
       if (submitButton.value) {
         submitButton.value.classList.add('submit-btn-animate-out');
         submitButton.value.addEventListener(
@@ -361,12 +358,45 @@ export default {
           },
           { once: true },
         );
-        if (formType.value === 'Register') {
-          userStore.registerUser(formData.value);
-        } else {
-          userStore.signInUser(formData.value);
+        const formIsValid = validateFormOnSubmit(values, actions);
+        if (formIsValid) {
+          if (formType.value === 'Register') {
+            userStore.registerUser(formData.value);
+          } else {
+            userStore.signInUser(formData.value);
+          }
         }
       }
+    };
+
+    const validateFormOnSubmit = (values: any, actions: any): boolean => {
+      let isFormValid = true;
+      if (!values.email) {
+        actions.setFieldError('email', 'Email is required');
+        isFormValid = false;
+      }
+      if (!values.password) {
+        actions.setFieldError('password', 'Password is required');
+        isFormValid = false;
+      }
+      if (formTypeIsRegister.value) {
+        if (!values.firstName) {
+          actions.setFieldError('firstName', 'First Name is required');
+          isFormValid = false;
+        }
+        if (!values.lastName) {
+          actions.setFieldError('lastName', 'Last Name is required');
+          isFormValid = false;
+        }
+        if (!values.password) {
+          actions.setFieldError(
+            'confirmPassword',
+            'Confirm Password is required',
+          );
+          isFormValid = false;
+        }
+      }
+      return isFormValid;
     };
 
     const formTypeIsRegister = computed(() => {
@@ -522,16 +552,18 @@ export default {
     user-select: none;
   }
 
-  form a {
+  form button {
     display: inline-block;
     position: relative;
     padding: 10px 20px;
     color: @login-button;
+    background-color: transparent;
     font-size: 16px;
     text-decoration: none;
     text-transform: uppercase;
     overflow: hidden;
     letter-spacing: 4px;
+    border: none;
     cursor: pointer;
     transition: 0.5s;
 
@@ -789,7 +821,7 @@ export default {
   font-size: 12px;
 }
 
-.form-box a:hover {
+.form-box button:hover {
   background: @login-button;
   color: @white;
   border-radius: 5px;
@@ -800,12 +832,12 @@ export default {
     0 0 32px @login-button-alt;
 }
 
-.form-box a span {
+.form-box button span {
   position: absolute;
   display: block;
 }
 
-.form-box a span:nth-child(1) {
+.form-box button span:nth-child(1) {
   top: 0;
   left: -100%;
   width: 100%;
@@ -824,7 +856,7 @@ export default {
   }
 }
 
-.form-box a span:nth-child(2) {
+.form-box button span:nth-child(2) {
   top: -100%;
   right: 0;
   width: 2px;
@@ -844,7 +876,7 @@ export default {
   }
 }
 
-.form-box a span:nth-child(3) {
+.form-box button span:nth-child(3) {
   bottom: 0;
   right: -100%;
   width: 100%;
@@ -864,7 +896,7 @@ export default {
   }
 }
 
-.form-box a span:nth-child(4) {
+.form-box button span:nth-child(4) {
   bottom: -100%;
   left: 0;
   width: 2px;
