@@ -6,6 +6,7 @@ export const useUserStore = defineStore('user', () => {
   const user = ref(0);
   const loginProcessing = ref(false);
   const loginSuccessful = ref(false);
+  const errorMsg = ref('');
 
   async function registerUser(newUser: RegisterUserPostRequest) {
     loginProcessing.value = true;
@@ -14,11 +15,10 @@ export const useUserStore = defineStore('user', () => {
       body: newUser,
     }).catch((error) => {
       loginSuccessful.value = false;
-      console.log('register error =', error);
+      errorMsg.value = error.response._data.code;
     });
     if (data) {
       loginSuccessful.value = true;
-      console.log('data =', data);
     }
     loginProcessing.value = false;
   }
@@ -30,14 +30,20 @@ export const useUserStore = defineStore('user', () => {
       body: user,
     }).catch((error) => {
       loginSuccessful.value = false;
-      console.log('login error =', error);
+      errorMsg.value = error.response._data.code;
     });
     if (data) {
       loginSuccessful.value = true;
-      console.log('data =', data);
     }
     loginProcessing.value = false;
   }
 
-  return { user, loginProcessing, loginSuccessful, registerUser, signInUser };
+  return {
+    user,
+    loginProcessing,
+    loginSuccessful,
+    errorMsg,
+    registerUser,
+    signInUser,
+  };
 });

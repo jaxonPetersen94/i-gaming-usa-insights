@@ -367,7 +367,10 @@ export default {
           if (formType.value === 'Register') {
             userStore.registerUser(formData.value);
           } else {
-            userStore.signInUser(formData.value);
+            await userStore.signInUser(formData.value);
+            if (userStore.loginSuccessful === false) {
+              actions.setFieldError('password', userStore.errorMsg);
+            }
           }
         }
       }
