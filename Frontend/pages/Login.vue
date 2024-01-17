@@ -14,7 +14,7 @@
         {{ getOppositeFormTypeText }}?
       </h2>
     </div>
-    <Form class="veeValidateForm" @submit="handleSubmit">
+    <Form ref="form" class="veeValidateForm" @submit="handleSubmit">
       <div
         class="inputs-container"
         :class="{
@@ -181,6 +181,8 @@ export default {
     ErrorMessage,
   },
   setup() {
+    const form = ref<any | null>(null);
+
     const formBox = ref<HTMLElement | null>(null);
     const submitButton = ref<HTMLElement | null>(null);
     const formTitleText = ref<HTMLElement | null>(null);
@@ -222,6 +224,8 @@ export default {
     });
 
     const toggleFormType = () => {
+      form.value.resetForm();
+
       if (!registerPageVisited.value) {
         registerPageVisited.value = true;
       }
@@ -488,6 +492,7 @@ export default {
     });
 
     return {
+      form,
       formBox,
       submitButton,
       formTitleText,
