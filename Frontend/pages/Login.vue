@@ -399,51 +399,6 @@ export default {
       return isFormValid;
     };
 
-    const formTypeIsRegister = computed(() => {
-      return formType.value === 'Register';
-    });
-
-    const formTypeIsForgotPassword = computed(() => {
-      return formType.value === 'Forgot Password';
-    });
-
-    const shouldFadeInForgotPassword = computed(() => {
-      return (
-        formType.value === 'Login' &&
-        registerPageVisited.value &&
-        !landedAtLoginPage.value
-      );
-    });
-
-    const shouldFadeInOppositeFormText = computed(() => {
-      return formType.value === 'Login' && forgotPasswordPageVisited.value;
-    });
-
-    const loginProcessing = computed(() => {
-      return userStore.loginProcessing;
-    });
-
-    const getOppositeFormTypeText = computed(() => {
-      return formType.value === 'Register' ? 'Login' : 'Register';
-    });
-
-    const updateUsernameEmail = (event: any) => {
-      formData.value.email = event.target.value;
-    };
-
-    const updatePassword = (event: any) => {
-      formData.value.password = event.target.value;
-    };
-
-    const handleNameInput = (event: any) => {
-      let char = String.fromCharCode(event.keyCode);
-      if (/^[A-Za-z']+$/.test(char)) {
-        return true;
-      } else {
-        event.preventDefault();
-      }
-    };
-
     const validateEmail_Blur = (value: any) => {
       if (!value) {
         return true;
@@ -487,6 +442,51 @@ export default {
       return true;
     };
 
+    const updateUsernameEmail = (event: any) => {
+      formData.value.email = event.target.value;
+    };
+
+    const updatePassword = (event: any) => {
+      formData.value.password = event.target.value;
+    };
+
+    const handleNameInput = (event: any) => {
+      let char = String.fromCharCode(event.keyCode);
+      if (/^[A-Za-z']+$/.test(char)) {
+        return true;
+      } else {
+        event.preventDefault();
+      }
+    };
+
+    const formTypeIsRegister = computed(() => {
+      return formType.value === 'Register';
+    });
+
+    const formTypeIsForgotPassword = computed(() => {
+      return formType.value === 'Forgot Password';
+    });
+
+    const shouldFadeInForgotPassword = computed(() => {
+      return (
+        formType.value === 'Login' &&
+        registerPageVisited.value &&
+        !landedAtLoginPage.value
+      );
+    });
+
+    const shouldFadeInOppositeFormText = computed(() => {
+      return formType.value === 'Login' && forgotPasswordPageVisited.value;
+    });
+
+    const loginProcessing = computed(() => {
+      return userStore.loginProcessing;
+    });
+
+    const getOppositeFormTypeText = computed(() => {
+      return formType.value === 'Register' ? 'Login' : 'Register';
+    });
+
     return {
       formBox,
       submitButton,
@@ -507,18 +507,18 @@ export default {
       toggleFormType,
       toggleForgotPassword,
       handleSubmit,
+      validateEmail_Blur,
+      validatePassword_Blur,
+      validateConfirmPassword_Blur,
+      updateUsernameEmail,
+      updatePassword,
+      handleNameInput,
       formTypeIsRegister,
       formTypeIsForgotPassword,
       shouldFadeInForgotPassword,
       shouldFadeInOppositeFormText,
       loginProcessing,
       getOppositeFormTypeText,
-      updateUsernameEmail,
-      updatePassword,
-      handleNameInput,
-      validateEmail_Blur,
-      validatePassword_Blur,
-      validateConfirmPassword_Blur,
     };
   },
 };
