@@ -23,6 +23,8 @@
     "vue-router": "^4.2.5"
   },
   "dependencies": {
+    "@fortawesome/free-solid-svg-icons": "^6.5.1",
+    "@fortawesome/vue-fontawesome": "^3.0.5",
     "@nuxtjs/eslint-config-typescript": "^12.1.0",
     "@pinia/nuxt": "^0.5.1",
     "@typescript-eslint/parser": "^6.11.0",
