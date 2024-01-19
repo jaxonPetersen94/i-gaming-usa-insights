@@ -172,6 +172,7 @@ import TextScramble from '@/utilities/textScrambler';
 import type { RegisterUserForm } from '@/types/User/types';
 import { Form, Field, ErrorMessage } from 'vee-validate';
 import { useUserStore } from '../stores/store';
+import { useRouter } from 'vue-router';
 
 export default {
   components: {
@@ -202,6 +203,7 @@ export default {
     const passwordBoxIsHidden = ref(false);
 
     const userStore = useUserStore();
+    const router = useRouter();
 
     const formData = ref<RegisterUserForm>({
       firstName: '',
@@ -364,13 +366,22 @@ export default {
         );
         const formIsValid = validateFormOnSubmit(values, actions);
         if (formIsValid) {
+          let result: boolean;
           if (formType.value === 'Register') {
-            userStore.registerUser(formData.value);
+            result = await userStore.registerUser(formData.value);
+            actions.setFieldError(
+              'confirmPassword',
+              result ? undefined : userStore.errorMsg,
+            );
           } else {
-            await userStore.signInUser(formData.value);
-            if (userStore.loginSuccessful === false) {
-              actions.setFieldError('password', userStore.errorMsg);
-            }
+            result = await userStore.signInUser(formData.value);
+            actions.setFieldError(
+              'password',
+              result ? undefined : userStore.errorMsg,
+            );
+          }
+          if (result && userStore.loginSuccessful) {
+            router.push('/dashboard');
           }
         }
       }

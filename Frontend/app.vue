@@ -1,8 +1,27 @@
 <template>
   <div>
+    <NavBar v-show="userIsAuthenticated" />
     <NuxtPage />
   </div>
 </template>
+
+<script lang="ts">
+import { useUserStore } from './stores/store';
+
+export default {
+  setup() {
+    const userStore = useUserStore();
+
+    const userIsAuthenticated = computed(() => {
+      return userStore.loginSuccessful && userStore.user.email;
+    });
+
+    return {
+      userIsAuthenticated,
+    };
+  },
+};
+</script>
 
 <style lang="less">
 @import './variables.less';

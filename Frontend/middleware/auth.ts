@@ -3,7 +3,7 @@ import { useUserStore } from '../stores/store';
 export default defineNuxtRouteMiddleware((to, from) => {
   const userStore = useUserStore();
 
-  const isAuthenticated = userStore.user != null ? false : true;
+  const isAuthenticated = userStore.userIsAuthenticated();
 
   if (!isAuthenticated) {
     return navigateTo('/login');
