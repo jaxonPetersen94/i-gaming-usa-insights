@@ -61,6 +61,7 @@ nav {
 }
 
 .dropdown {
+  appearance: none;
   -webkit-appearance: none;
   margin: 0;
   z-index: 999;
