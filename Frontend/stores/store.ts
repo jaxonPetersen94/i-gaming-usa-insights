@@ -71,6 +71,13 @@ export const useUserStore = defineStore('user', () => {
     }
   }
 
+  async function signOutUser() {
+    await $fetch(APP_CONST.API_USER_LOGOUT, { method: 'post' });
+    loginSuccessful.value = false;
+    fireBaseUser.value = {} as any;
+    user.value = {} as User;
+  }
+
   return {
     user,
     loginProcessing,
@@ -79,5 +86,6 @@ export const useUserStore = defineStore('user', () => {
     userIsAuthenticated,
     registerUser,
     signInUser,
+    signOutUser,
   };
 });

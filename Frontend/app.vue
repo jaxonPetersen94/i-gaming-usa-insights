@@ -1,6 +1,6 @@
 <template>
   <div>
-    <NavBar v-show="userIsAuthenticated" />
+    <NavBar v-if="userIsAuthenticated" />
     <NuxtPage />
   </div>
 </template>

@@ -7,15 +7,31 @@
         <font-awesome-icon icon="fa-solid fa-user" />
       </div>
       <div class="section-dropdown">
-        <a href="#">Account<i class="uil uil-arrow-right"></i></a>
-        <a href="#">Log out<i class="uil uil-arrow-right"></i></a>
+        <router-link to="/account">Account</router-link>
+        <a @mouseup="handleLogOut">Log out</a>
       </div>
     </div>
   </nav>
 </template>
 
-<script>
-export default {};
+<script lang="ts">
+import { useUserStore } from '../stores/store';
+import { useRouter } from 'vue-router';
+
+export default {
+  setup() {
+    const userStore = useUserStore();
+    const router = useRouter();
+
+    const handleSignOut = async () => {
+      await userStore.signOutUser();
+      router.push('/login');
+    };
+    return {
+      handleLogOut: handleSignOut,
+    };
+  },
+};
 </script>
 
 <style scoped lang="less">
@@ -79,20 +95,14 @@ nav {
 }
 
 .dropdown:checked {
-  border: 1px solid white;
-}
-
-.dropdown:checked ~ .section-dropdown {
-  opacity: 1;
-  pointer-events: auto;
-  transform: translateY(0);
+  border: 1px solid @white;
 }
 
 .section-dropdown {
   display: flex;
   flex-direction: column;
   position: absolute;
-  background-color: #111;
+  background-color: @charcoal;
   top: 90px;
   right: 8px;
   width: auto;
@@ -110,6 +120,7 @@ nav {
     display: flex;
     color: @white;
     font-size: 16px;
+    cursor: pointer;
   }
 }
 
@@ -120,9 +131,15 @@ nav {
   right: 18px;
   border-left: 16px solid transparent;
   border-right: 16px solid transparent;
-  border-bottom: 20px solid #111;
+  border-bottom: 20px solid @charcoal;
   display: block;
   z-index: 2;
   transition: all 200ms linear;
+}
+
+.dropdown:checked ~ .section-dropdown {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
 }
 </style>
