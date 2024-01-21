@@ -2,13 +2,13 @@
   <nav>
     <router-link to="/dashboard">Dashboard</router-link>
     <div>
-      <input class="dropdown" type="checkbox" />
+      <input v-model="dropdownOpen" class="dropdown" type="checkbox" />
       <div class="user-profile-icon">
         <font-awesome-icon icon="fa-solid fa-user" />
       </div>
       <div class="section-dropdown">
         <router-link to="/account">Account</router-link>
-        <a @mouseup="handleLogOut">Log out</a>
+        <a @mouseup="handleSignOut">Log out</a>
       </div>
     </div>
   </nav>
@@ -22,13 +22,21 @@ export default {
   setup() {
     const userStore = useUserStore();
     const router = useRouter();
+    const dropdownOpen = ref(false);
 
     const handleSignOut = async () => {
       await userStore.signOutUser();
       router.push('/login');
     };
+
+    router.beforeEach((to, from) => {
+      dropdownOpen.value = false;
+      return true;
+    });
+
     return {
-      handleLogOut: handleSignOut,
+      dropdownOpen,
+      handleSignOut,
     };
   },
 };
