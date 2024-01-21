@@ -367,21 +367,25 @@ export default {
         const formIsValid = validateFormOnSubmit(values, actions);
         if (formIsValid) {
           let result: boolean;
-          if (formType.value === 'Register') {
-            result = await userStore.registerUser(formData.value);
-            actions.setFieldError(
-              'confirmPassword',
-              result ? undefined : userStore.errorMsg,
-            );
+          if (formTypeIsForgotPassword.value) {
+            result = await userStore.forgotPassword(formData.value.email);
           } else {
-            result = await userStore.signInUser(formData.value);
-            actions.setFieldError(
-              'password',
-              result ? undefined : userStore.errorMsg,
-            );
-          }
-          if (result && userStore.loginSuccessful) {
-            router.push('/dashboard');
+            if (formType.value === 'Register') {
+              result = await userStore.registerUser(formData.value);
+              actions.setFieldError(
+                'confirmPassword',
+                result ? undefined : userStore.errorMsg,
+              );
+            } else {
+              result = await userStore.signInUser(formData.value);
+              actions.setFieldError(
+                'password',
+                result ? undefined : userStore.errorMsg,
+              );
+            }
+            if (result && userStore.loginSuccessful) {
+              router.push('/dashboard');
+            }
           }
         }
       }
@@ -393,7 +397,7 @@ export default {
         actions.setFieldError('email', 'Email is required');
         isFormValid = false;
       }
-      if (!values.password) {
+      if (!formTypeIsForgotPassword.value && !values.password) {
         actions.setFieldError('password', 'Password is required');
         isFormValid = false;
       }

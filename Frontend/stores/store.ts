@@ -13,36 +13,6 @@ export const useUserStore = defineStore('user', () => {
     return !!fireBaseUser.value.stsTokenManager?.accessToken;
   };
 
-  async function registerUser(
-    newUser: RegisterUserPostRequest,
-  ): Promise<boolean> {
-    try {
-      loginProcessing.value = true;
-      const data = await $fetch(APP_CONST.API_USER_REGISTER, {
-        method: 'post',
-        body: newUser,
-      });
-      loginSuccessful.value = true;
-      fireBaseUser.value = data;
-      user.value = {
-        firstName: newUser.firstName,
-        lastName: newUser.lastName,
-        email: fireBaseUser.value.email,
-      };
-      return true;
-    } catch (error: any) {
-      loginSuccessful.value = false;
-      if (error.response) {
-        errorMsg.value = error.response._data.code;
-      } else {
-        errorMsg.value = 'FetchError: Failed to fetch';
-      }
-      return false;
-    } finally {
-      loginProcessing.value = false;
-    }
-  }
-
   async function signInUser(userLoginData: any): Promise<boolean> {
     try {
       loginProcessing.value = true;
@@ -78,14 +48,62 @@ export const useUserStore = defineStore('user', () => {
     user.value = {} as User;
   }
 
+  async function registerUser(
+    newUserData: RegisterUserPostRequest,
+  ): Promise<boolean> {
+    try {
+      loginProcessing.value = true;
+      const data = await $fetch(APP_CONST.API_USER_REGISTER, {
+        method: 'post',
+        body: newUserData,
+      });
+      loginSuccessful.value = true;
+      fireBaseUser.value = data;
+      user.value = {
+        firstName: newUserData.firstName,
+        lastName: newUserData.lastName,
+        email: fireBaseUser.value.email,
+      };
+      return true;
+    } catch (error: any) {
+      loginSuccessful.value = false;
+      if (error.response) {
+        errorMsg.value = error.response._data.code;
+      } else {
+        errorMsg.value = 'FetchError: Failed to fetch';
+      }
+      return false;
+    } finally {
+      loginProcessing.value = false;
+    }
+  }
+
+  async function forgotPassword(email: string): Promise<boolean> {
+    try {
+      await $fetch(APP_CONST.API_USER_FORGOT_PASSWORD, {
+        method: 'post',
+        body: { email },
+      });
+      return true;
+    } catch (error: any) {
+      if (error.response) {
+        errorMsg.value = error.response._data.code;
+      } else {
+        errorMsg.value = 'Error: Failed to send password reset email';
+      }
+      return false;
+    }
+  }
+
   return {
     user,
     loginProcessing,
     loginSuccessful,
     errorMsg,
     userIsAuthenticated,
-    registerUser,
     signInUser,
     signOutUser,
+    registerUser,
+    forgotPassword,
   };
 });
