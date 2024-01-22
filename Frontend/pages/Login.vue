@@ -61,13 +61,25 @@
           <label>Last Name</label>
         </div>
         <span
-          class="forgot-password-instructions-text"
+          class="forgot-password-info-text forgot-password-info-text-instructions"
           :class="{
-            'forgot-password-instructions-text-fade-in':
-              passwordBoxIsHidden && formType === 'Forgot Password',
+            'forgot-password-info-text-instructions-fade-in':
+              passwordBoxIsHidden &&
+              formType === 'Forgot Password' &&
+              !forgotPasswordEmailSent,
           }"
         >
           Please enter the email you use to login.
+        </span>
+        <span
+          ref="forgotPasswordInfoEmailSentText"
+          class="forgot-password-info-text forgot-password-info-text-email-sent"
+          :class="{
+            'forgot-password-info-text-email-sent-fade-in':
+              forgotPasswordEmailSent,
+          }"
+        >
+          {{ forgotPasswordEmailSentString }}
         </span>
         <div
           ref="usernameEmailInputBox"
@@ -76,6 +88,7 @@
             'input-box-email-slide-down': formTypeIsForgotPassword,
             'input-box-email-slide-up':
               !formTypeIsForgotPassword && forgotPasswordPageVisited,
+            'input-box-email-fade-out': forgotPasswordEmailSent,
           }"
         >
           <Field
@@ -183,17 +196,20 @@ export default {
   },
   setup() {
     const form = ref<any | null>(null);
-
     const formBox = ref<HTMLElement | null>(null);
     const submitButton = ref<HTMLElement | null>(null);
     const formTitleText = ref<HTMLElement | null>(null);
     const oppositeFormText = ref<HTMLElement | null>(null);
     const usernameEmailText = ref<HTMLElement | null>(null);
     const usernameEmailInputBox = ref<HTMLElement | null>(null);
+    const forgotPasswordInfoEmailSentText = ref<HTMLElement | null>(null);
 
     const formType = ref('Login');
     const usernameOrEmail = ref('Username');
     const forgotPasswordText = ref('Forgot Password');
+    const forgotPasswordEmailSentString = ref(
+      "Check your email for a link to reset your password. If it doesn't appear within a few minutes, check your spam folder.",
+    );
 
     const formTransitionOccuring = ref(false);
     const landedAtRegisterPage = ref(false);
@@ -215,6 +231,7 @@ export default {
 
     let formTitleTextScramble: TextScramble;
     let usernameEmailTextScramble: TextScramble;
+    let forgotPasswordInfoTextScramble: TextScramble;
 
     onMounted(() => {
       if (formTitleText.value) {
@@ -369,6 +386,17 @@ export default {
           let result: boolean;
           if (formTypeIsForgotPassword.value) {
             result = await userStore.forgotPassword(formData.value.email);
+            if (result && forgotPasswordEmailSent) {
+              if (forgotPasswordInfoEmailSentText.value) {
+                forgotPasswordInfoTextScramble = new TextScramble(
+                  forgotPasswordInfoEmailSentText.value,
+                );
+                applyScrambleTextEffect(
+                  forgotPasswordInfoTextScramble,
+                  forgotPasswordEmailSentString.value,
+                );
+              }
+            }
           } else {
             if (formType.value === 'Register') {
               result = await userStore.registerUser(formData.value);
@@ -509,6 +537,10 @@ export default {
       return formType.value === 'Register' ? 'Login' : 'Register';
     });
 
+    const forgotPasswordEmailSent = computed(() => {
+      return userStore.forgotPasswordEmailSent;
+    });
+
     return {
       form,
       formBox,
@@ -520,6 +552,8 @@ export default {
       formType,
       usernameOrEmail,
       forgotPasswordText,
+      forgotPasswordEmailSentString,
+      forgotPasswordInfoEmailSentText,
       formTransitionOccuring,
       landedAtRegisterPage,
       landedAtLoginPage,
@@ -542,6 +576,7 @@ export default {
       shouldFadeInOppositeFormText,
       loginProcessing,
       getOppositeFormTypeText,
+      forgotPasswordEmailSent,
     };
   },
 };
@@ -809,30 +844,52 @@ export default {
     transition: transform 0.7s;
   }
 
+  &-email-fade-out {
+    opacity: 0;
+    transition-delay: 0s !important;
+    transition: opacity 0.35s !important;
+    pointer-events: none;
+  }
+
   &-password-fade-out {
     width: 320px;
-    pointer-events: none;
     opacity: 0;
     transition: opacity 0.35s !important;
     transition-delay: 0s !important;
+    pointer-events: none;
   }
 }
 
-.forgot-password-instructions-text {
+.forgot-password-info-text {
   position: absolute;
+  width: 284px;
   left: 0;
   right: 0;
   margin-left: auto;
   margin-right: auto;
-  margin-bottom: 104px;
-  width: 282px;
   color: @white;
-  opacity: 0;
-  transition: opacity 0.35s;
   z-index: -999;
+  text-align: center;
+  max-height: 57px;
 
-  &-fade-in {
-    opacity: 1;
+  &-instructions {
+    transform: translateY(-104px);
+    opacity: 0;
+    transition: opacity 0.35s;
+
+    &-fade-in {
+      opacity: 1;
+    }
+  }
+
+  &-email-sent {
+    transform: translateY(-66px);
+    opacity: 0;
+    transition: opacity 0.35s;
+
+    &-fade-in {
+      opacity: 1;
+    }
   }
 }
 

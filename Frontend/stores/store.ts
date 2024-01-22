@@ -8,6 +8,7 @@ export const useUserStore = defineStore('user', () => {
   const loginProcessing = ref(false);
   const loginSuccessful = ref(false);
   const errorMsg = ref('');
+  const forgotPasswordEmailSent = ref(false);
 
   const userIsAuthenticated = (): boolean => {
     return !!fireBaseUser.value.stsTokenManager?.accessToken;
@@ -84,6 +85,7 @@ export const useUserStore = defineStore('user', () => {
         method: 'post',
         body: { email },
       });
+      forgotPasswordEmailSent.value = true;
       return true;
     } catch (error: any) {
       if (error.response) {
@@ -100,6 +102,7 @@ export const useUserStore = defineStore('user', () => {
     loginProcessing,
     loginSuccessful,
     errorMsg,
+    forgotPasswordEmailSent,
     userIsAuthenticated,
     signInUser,
     signOutUser,
