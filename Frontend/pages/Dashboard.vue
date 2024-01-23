@@ -1,9 +1,19 @@
 <template>
-  <div></div>
+  <div>
+    <Grid />
+  </div>
 </template>
 
-<script>
+<script lang="ts">
+import Grid from '../components/Grid.vue';
+
 definePageMeta({
   middleware: 'auth',
 });
+
+export default {
+  components: {
+    Grid,
+  },
+};
 </script>
