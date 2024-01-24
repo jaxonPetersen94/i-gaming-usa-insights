@@ -2,18 +2,26 @@
   <div class="wrapper">
     <div class="grids-container">
       <div class="grid grid-large">
-        <div class="card-slot"></div>
-        <div class="card-slot"></div>
-        <div class="card-slot"></div>
-        <div class="card-slot"></div>
-        <div class="card-slot"></div>
-        <div class="card-slot"></div>
+        <div class="card-slot"><Card cardTitle="Conversions" /></div>
+        <div class="card-slot"><Card cardTitle="Conversion rate" /></div>
+        <div class="card-slot"><Card cardTitle="Sessions" /></div>
+        <div class="card-slot"><Card :isLinkedCard="true" /></div>
+        <div class="card-slot"><Card :isLinkedCard="true" /></div>
+        <div class="card-slot"><Card :isLinkedCard="true" /></div>
       </div>
       <div class="grid grid-small">
-        <div class="card-slot"></div>
-        <div class="card-slot"></div>
-        <div class="card-slot"></div>
-        <div class="card-slot"></div>
+        <div class="card-slot">
+          <Card cardTitle="Stickiness - 7 day" :cardIsLarge="false" />
+        </div>
+        <div class="card-slot">
+          <Card cardTitle="Engagement - 7 day" :cardIsLarge="false" />
+        </div>
+        <div class="card-slot">
+          <Card cardTitle="Bounce rate - 7 day" :cardIsLarge="false" />
+        </div>
+        <div class="card-slot">
+          <Card cardTitle="User locations - live" :cardIsLarge="false" />
+        </div>
       </div>
     </div>
   </div>
@@ -32,33 +40,28 @@ export default {
 <style scoped lang="less">
 .wrapper {
   margin: 48px auto auto auto;
-  width: 75%;
+  width: 72%;
   min-width: 792px;
   .grids-container {
     display: grid;
     grid-template-columns: 3fr 1fr;
-    gap: 8px;
-    padding: 8px;
+    gap: 14px;
 
     .grid {
-      background-color: rgba(255, 255, 255, 0.8);
-      height: 704px;
+      display: grid;
+      gap: 14px;
 
       &-large {
-        display: grid;
         grid-template-columns: 2fr 2fr 2fr;
-        gap: 8px;
+        grid-template-rows: repeat(1, 0fr);
       }
 
       &-small {
-        display: grid;
         grid-template-columns: 4fr;
-        gap: 8px;
       }
 
       .card-slot {
-        height: 100%;
-        background-color: rgba(255, 172, 172, 0.8);
+        user-select: none;
       }
     }
   }
