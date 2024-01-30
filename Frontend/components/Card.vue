@@ -19,7 +19,9 @@
       <div v-else class="small-content-container">
         <div class="data-container">
           <div class="data-point-container">
-            <span class="data-point">80.3%</span>
+            <span class="data-point"
+              >80.3<span class="data-point-symbol">%</span></span
+            >
             <span class="data-label">New users</span>
           </div>
           <div class="data-point-container">
@@ -136,6 +138,10 @@ export default {
             margin: 20px 0 0px 0;
             font-size: 32px;
             font-weight: bold;
+
+            &-symbol {
+              font-size: 20px;
+            }
           }
 
           .data-label {
