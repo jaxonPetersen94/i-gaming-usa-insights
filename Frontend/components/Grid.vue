@@ -40,8 +40,8 @@ export default {
 <style scoped lang="less">
 .wrapper {
   margin: 48px auto auto auto;
-  width: 72%;
-  min-width: 792px;
+  max-width: 1280px;
+  min-width: 768px;
   .grids-container {
     display: grid;
     grid-template-columns: 3fr 1fr;

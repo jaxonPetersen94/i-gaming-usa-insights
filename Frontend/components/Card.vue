@@ -5,7 +5,7 @@
         <span class="card-title">{{ cardTitle }}</span>
       </div>
       <div v-if="cardIsLarge" class="large-content-container">
-        <div v-if="isLinkedCard">
+        <div v-if="isLinkedCard" class="linked-card-container">
           <div class="linked-card-graph-container"></div>
         </div>
         <div v-else>
@@ -63,67 +63,84 @@ export default {
   border: 1px solid rgba(255, 255, 255, 0.4);
   border-radius: 8px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
-}
 
-.card-interior-container {
-  display: flex;
-  flex-direction: column;
-  padding: 12px;
-  color: @white;
-
-  .card-title {
-    font-weight: bold;
-  }
-
-  .large-content-container {
-    .data-container {
-      display: flex;
-      flex-direction: column;
-      margin-top: 8px;
-
-      .data-point {
-        font-size: 56px;
-        line-height: 56px;
-        font-weight: bold;
-      }
-    }
-
-    .graph-container {
-      height: 128px;
-      margin-top: 32px;
-      border: blue solid 1px;
-    }
-
-    .linked-card-graph-container {
-      height: 128px;
-      margin-top: 16px;
-      border: blue solid 1px;
-    }
-  }
-
-  .small-content-container {
+  .card-interior-container {
     display: flex;
     flex-direction: column;
-    flex: 1;
-    justify-content: center;
+    height: 100%;
+    padding: 12px;
+    color: @white;
 
-    .data-container {
-      display: flex;
-      flex-direction: row;
-      justify-content: space-between;
+    .card-title {
+      font-size: 18px;
+      font-weight: bold;
+    }
 
-      .data-point-container {
+    .large-content-container {
+      height: 100%;
+
+      .data-container {
         display: flex;
         flex-direction: column;
+        margin-top: 8px;
 
         .data-point {
-          margin: 16px 0 8px 0;
-          font-size: 32px;
+          font-size: 56px;
+          line-height: 56px;
           font-weight: bold;
         }
 
         .data-label {
-          font-size: 12px;
+          font-size: 18px;
+        }
+      }
+
+      .graph-container {
+        height: 128px;
+        margin-top: 32px;
+        border: blue solid 1px;
+      }
+
+      .linked-card-container {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+
+        .linked-card-graph-container {
+          flex: 1;
+          margin-top: 16px;
+          border: blue solid 1px;
+        }
+      }
+    }
+
+    .small-content-container {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      justify-content: center;
+
+      .data-container {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-around;
+
+        .data-point-container {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          text-align: center;
+          margin-bottom: 16px;
+
+          .data-point {
+            margin: 20px 0 0px 0;
+            font-size: 32px;
+            font-weight: bold;
+          }
+
+          .data-label {
+            font-size: 16px;
+          }
         }
       }
     }
