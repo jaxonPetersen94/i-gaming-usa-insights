@@ -1,10 +1,8 @@
 # i-gaming-usa-insights
 
-USA Gambling Market Analytics/Insights Dashboard! 🎲📊📈
+USA Gambling Market Analytics/Insights Dashboard 🎲📊📈
 
-This web application offers real-time insights and analytics on the USA gambling market. 
-Users can seamlessly explore data related to online casinos, sports betting, and other forms of iGaming within the USA. 
-The project leverages Vue.js, Nuxt.js, and Pinia for state management, while relying on Firebase/Firestore for data storage and Cloud Functions for efficient serverless data processing.
+This web application provides real-time insights and analytics on the USA gambling market, allowing users to seamlessly explore data related to online casinos, sports betting, and other forms of iGaming. The project efficiently utilizes Vue.js for the user interface, Nuxt.js for server-side rendering, and Pinia for state management. Firebase/Firestore is dedicated to user management, while MongoDB serves as the non-relational database, ensuring a robust and flexible solution for handling diverse data sets.
 
 ## Login
 ![SnagIt_Login](https://github.com/jaxonPetersen94/i-gaming-usa-insights/assets/29075938/74dc853b-c70b-4383-a181-f08a4532c4c8)
