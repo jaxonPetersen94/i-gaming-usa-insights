@@ -17,11 +17,11 @@ app.use(cors());
 app.use(express.json());
 app.use(authenticationRoutes);
 
+const mongoDatabase = initializeDatabase();
+
 const server = https.createServer(options, app);
-
-const db = initializeDatabase();
-
 server.listen(port, () => {
   console.log(`Server is running on port ${port}`);
-  db;
 });
+
+export { mongoDatabase };

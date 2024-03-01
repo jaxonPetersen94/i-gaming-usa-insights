@@ -5,6 +5,7 @@ import {
   register,
   forgotPassword,
 } from '../controllers/AuthController.js';
+import { mongoDatabase } from '../app.js';
 
 const router = express.Router();
 
@@ -31,6 +32,8 @@ router.post('/api/register', async (req: Request, res: Response) => {
   try {
     const newUser = req.body;
     const response = await register(newUser);
+    const { password, confirmPassword, ...newUserDbEntry } = req.body;
+    await mongoDatabase.collection('Users').insertOne(newUserDbEntry);
     res.status(200).send(response.user);
   } catch (error) {
     res.status(500).json(error);
