@@ -4,29 +4,29 @@ import APP_CONST from '~/constants/appConstants';
 
 export const useUserStore = defineStore('user', () => {
   const user = ref({} as User);
-  const fireBaseUser = ref({} as any);
   const loginProcessing = ref(false);
   const loginSuccessful = ref(false);
   const errorMsg = ref('');
   const forgotPasswordEmailSent = ref(false);
 
   const userIsAuthenticated = (): boolean => {
-    return !!fireBaseUser.value.stsTokenManager?.accessToken;
+    return !!user.value.accessToken;
   };
 
   async function signInUser(userLoginData: any): Promise<boolean> {
     try {
       loginProcessing.value = true;
-      const data = await $fetch(APP_CONST.API_USER_LOGIN, {
+      const data: User = await $fetch(APP_CONST.API_USER_LOGIN, {
         method: 'post',
         body: userLoginData,
       });
       loginSuccessful.value = true;
-      fireBaseUser.value = data;
       user.value = {
-        firstName: '',
-        lastName: '',
-        email: fireBaseUser.value.email,
+        firebaseUid: data.firebaseUid,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+        accessToken: data.accessToken,
       };
       return true;
     } catch (error: any) {
@@ -45,7 +45,6 @@ export const useUserStore = defineStore('user', () => {
   async function signOutUser() {
     await $fetch(APP_CONST.API_USER_LOGOUT, { method: 'post' });
     loginSuccessful.value = false;
-    fireBaseUser.value = {} as any;
     user.value = {} as User;
   }
 
@@ -54,16 +53,17 @@ export const useUserStore = defineStore('user', () => {
   ): Promise<boolean> {
     try {
       loginProcessing.value = true;
-      const data = await $fetch(APP_CONST.API_USER_REGISTER, {
+      const data: User = await $fetch(APP_CONST.API_USER_REGISTER, {
         method: 'post',
         body: newUserData,
       });
       loginSuccessful.value = true;
-      fireBaseUser.value = data;
       user.value = {
-        firstName: newUserData.firstName,
-        lastName: newUserData.lastName,
-        email: fireBaseUser.value.email,
+        firebaseUid: data.firebaseUid,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+        accessToken: data.accessToken,
       };
       return true;
     } catch (error: any) {

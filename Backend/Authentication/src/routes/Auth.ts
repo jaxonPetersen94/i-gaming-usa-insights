@@ -13,7 +13,18 @@ router.post('/api/login', async (req: Request, res: Response) => {
   try {
     const user = req.body;
     const response = await login(user);
-    res.status(200).send(response.user);
+    const mongoUser = await mongoDatabase.collection('Users').findOne({
+      $or: [{ email: response.user.email }, { firebaseUid: response.user.uid }],
+    });
+    if (mongoUser) {
+      const returnedUser = {
+        ...mongoUser,
+        accessToken: (response.user as any).stsTokenManager.accessToken,
+      };
+      res.status(200).send(returnedUser);
+    } else {
+      res.status(500).json('User not found in MongoDB');
+    }
   } catch (error) {
     res.status(500).json(error);
   }
@@ -32,9 +43,18 @@ router.post('/api/register', async (req: Request, res: Response) => {
   try {
     const newUser = req.body;
     const response = await register(newUser);
-    const { password, confirmPassword, ...newUserDbEntry } = req.body;
+    const newUserDbEntry = {
+      firebaseUid: response.user.uid,
+      email: response.user.email,
+      firstName: req.body.firstName,
+      lastName: req.body.lastName,
+    };
     await mongoDatabase.collection('Users').insertOne(newUserDbEntry);
-    res.status(200).send(response.user);
+    const returnedUser = {
+      ...newUserDbEntry,
+      accessToken: (response.user as any).stsTokenManager.accessToken,
+    };
+    res.status(200).send(returnedUser);
   } catch (error) {
     res.status(500).json(error);
   }

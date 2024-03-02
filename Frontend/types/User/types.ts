@@ -19,7 +19,9 @@ export interface RegisterUserPostRequest {
 }
 
 export interface User {
+  firebaseUid: string;
   firstName: string;
   lastName: string;
   email: string;
+  accessToken: string;
 }
