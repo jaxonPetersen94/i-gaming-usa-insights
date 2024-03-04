@@ -2,6 +2,7 @@
   <nav>
     <router-link to="/dashboard">Dashboard</router-link>
     <div>
+      <span>Hello, {{ userFullName }}</span>
       <input v-model="dropdownOpen" class="dropdown" type="checkbox" />
       <div class="user-profile-icon">
         <font-awesome-icon icon="fa-solid fa-user" />
@@ -29,14 +30,19 @@ export default {
       router.push('/login');
     };
 
-    router.beforeEach((to, from) => {
+    router.beforeEach(() => {
       dropdownOpen.value = false;
       return true;
+    });
+
+    const userFullName = computed(() => {
+      return `${userStore.user.firstName} ${userStore.user.lastName}`;
     });
 
     return {
       dropdownOpen,
       handleSignOut,
+      userFullName,
     };
   },
 };
@@ -65,6 +71,10 @@ nav {
     display: flex;
     justify-content: flex-end;
     align-items: center;
+
+    span {
+      color: @white;
+    }
   }
 }
 
