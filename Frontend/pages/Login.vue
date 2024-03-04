@@ -823,14 +823,17 @@ export default {
     opacity: 0;
     transition: opacity 0.35s;
     width: 320px;
+    visibility: hidden;
 
     &-override {
       transition-delay: 0.375s;
       opacity: 1;
+      visibility: visible;
     }
 
     &-final {
       position: relative;
+      visibility: visible;
     }
   }
 
