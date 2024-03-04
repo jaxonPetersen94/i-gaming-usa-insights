@@ -100,7 +100,6 @@ export default {
       .graph-container {
         height: 128px;
         margin-top: 32px;
-        border: blue solid 1px;
       }
 
       .linked-card-container {
@@ -111,7 +110,6 @@ export default {
         .linked-card-graph-container {
           flex: 1;
           margin-top: 16px;
-          border: blue solid 1px;
         }
       }
     }

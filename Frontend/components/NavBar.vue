@@ -2,7 +2,7 @@
   <nav>
     <router-link to="/dashboard">Dashboard</router-link>
     <div>
-      <span>Hello, {{ userFullName }}</span>
+      <span>Hello, {{ userFullName }}!</span>
       <input v-model="dropdownOpen" class="dropdown" type="checkbox" />
       <div class="user-profile-icon">
         <font-awesome-icon icon="fa-solid fa-user" />
