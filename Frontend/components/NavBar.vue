@@ -25,15 +25,32 @@ export default {
     const router = useRouter();
     const dropdownOpen = ref(false);
 
-    const handleSignOut = async () => {
-      await userStore.signOutUser();
-      router.push('/login');
-    };
+    onMounted(() => {
+      document.addEventListener('click', handleBodyClick);
+    });
+
+    onUnmounted(() => {
+      document.removeEventListener('click', handleBodyClick);
+    });
 
     router.beforeEach(() => {
       dropdownOpen.value = false;
       return true;
     });
+
+    const handleSignOut = async () => {
+      await userStore.signOutUser();
+      router.push('/login');
+    };
+
+    const handleBodyClick = (event: MouseEvent) => {
+      if (
+        dropdownOpen.value &&
+        !(event.target as HTMLElement).closest('.section-dropdown')
+      ) {
+        dropdownOpen.value = false;
+      }
+    };
 
     const userFullName = computed(() => {
       return `${userStore.user.firstName} ${userStore.user.lastName}`;
