@@ -106,7 +106,7 @@ nav {
   background-color: @gray;
   cursor: pointer;
 
-  :first-child {
+  svg {
     color: @white;
   }
 }

@@ -42,6 +42,7 @@ export default {
   margin: 48px auto auto auto;
   max-width: 1280px;
   min-width: 768px;
+
   .grids-container {
     display: grid;
     grid-template-columns: 3fr 1fr;
