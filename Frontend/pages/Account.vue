@@ -17,7 +17,11 @@
   </div>
 </template>
 
-<script lang="ts"></script>
+<script lang="ts">
+definePageMeta({
+  middleware: 'auth',
+});
+</script>
 
 <style scoped lang="less">
 @import '../variables.less';
@@ -41,6 +45,7 @@
       padding: 16px 32px;
       flex-direction: column;
       color: @white;
+      user-select: none;
 
       .line-break {
         width: 100%;
@@ -55,6 +60,7 @@
         font-size: 24px;
         font-weight: bold;
         align-items: center;
+        user-select: none;
 
         svg {
           font-size: 40px;
