@@ -27,6 +27,7 @@
                   name="firstName"
                   type="text"
                   class="input-field"
+                  :value="user.firstName"
                   required
                 />
                 <ErrorMessage
@@ -41,8 +42,14 @@
                 <label>Date of Birth</label>
               </div>
               <div class="input-container">
-                <Field name="???" type="text" class="input-field" required />
-                <ErrorMessage name="???" class="form-validation-error-text" />
+                <Field
+                  name="email"
+                  type="text"
+                  class="input-field"
+                  :value="user.email"
+                  required
+                />
+                <ErrorMessage name="email" class="form-validation-error-text" />
                 <label>Email</label>
               </div>
             </div>
@@ -52,6 +59,7 @@
                   name="lastName"
                   type="text"
                   class="input-field"
+                  :value="user.lastName"
                   required
                 />
                 <ErrorMessage
@@ -92,6 +100,7 @@
 
 <script lang="ts">
 import { Field, ErrorMessage } from 'vee-validate';
+import { useUserStore } from '../stores/store';
 
 export default {
   components: {
@@ -100,6 +109,9 @@ export default {
   },
 
   setup() {
+    const userStore = useUserStore();
+    const user = userStore.user;
+
     const changeAccountPicture = () => {
       console.log('Open Account Picture change modal!');
     };
@@ -113,6 +125,7 @@ export default {
     };
 
     return {
+      user,
       changeAccountPicture,
       changePassword,
       handleSaveChanges,
@@ -219,6 +232,9 @@ definePageMeta({
           }
 
           .input-column {
+            display: flex;
+            flex-direction: column;
+            gap: 48px;
             width: 100%;
 
             .input-container {
@@ -230,25 +246,26 @@ definePageMeta({
               .input-field {
                 width: 100%;
                 display: block;
-                padding: 10px 0;
+                padding: 10px 0 10px 6px;
                 font-size: 16px;
-                color: @white;
-                margin-bottom: 30px;
+                color: @input-text;
                 border: none;
                 border-bottom: 1px solid @white;
                 outline: none;
-                background: transparent;
+                border-radius: 0px 16px 0 0;
+                box-shadow: inset 0 6px 12px 0 rgba(0, 0, 0, 0.12);
+                background-color: transparent;
                 cursor: default;
 
                 &:-webkit-autofill {
                   -webkit-background-clip: text;
-                  -webkit-text-fill-color: @white !important;
+                  -webkit-text-fill-color: @input-text !important;
                 }
 
                 &:focus ~ label,
                 &:valid ~ label {
-                  top: -20px;
-                  left: 0;
+                  top: -25px;
+                  left: -8px;
                   color: @login-button;
                   font-size: 12px;
                 }
@@ -258,9 +275,9 @@ definePageMeta({
                 position: absolute;
                 top: 0;
                 left: 0;
-                padding: 10px 0;
+                padding: 10px 0 10px 8px;
                 font-size: 16px;
-                color: @white;
+                color: @input-text-placeholder;
                 pointer-events: none;
                 transition: 0.5s;
                 user-select: none;

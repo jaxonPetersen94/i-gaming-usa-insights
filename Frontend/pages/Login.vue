@@ -769,7 +769,7 @@ export default {
     width: 100%;
     padding: 10px 0;
     font-size: 16px;
-    color: @white;
+    color: @input-text;
     margin-bottom: 30px;
     border: none;
     border-bottom: 1px solid @white;
@@ -779,7 +779,7 @@ export default {
 
     &:-webkit-autofill {
       -webkit-background-clip: text;
-      -webkit-text-fill-color: @white !important;
+      -webkit-text-fill-color: @input-text !important;
     }
   }
 
@@ -789,7 +789,7 @@ export default {
     left: 0;
     padding: 10px 0;
     font-size: 16px;
-    color: @white;
+    color: @input-text-placeholder;
     pointer-events: none;
     transition: 0.5s;
     user-select: none;
