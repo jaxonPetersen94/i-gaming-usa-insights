@@ -776,10 +776,19 @@ export default {
     outline: none;
     background: transparent;
     cursor: default;
+    text-indent: 4px;
 
     &:-webkit-autofill {
       -webkit-background-clip: text;
       -webkit-text-fill-color: @input-text !important;
+    }
+
+    &:focus ~ label,
+    &:valid ~ label {
+      top: -20px;
+      left: 0;
+      color: @login-button;
+      font-size: 12px;
     }
   }
 
@@ -895,14 +904,6 @@ export default {
       opacity: 1;
     }
   }
-}
-
-.inputField:focus ~ label,
-.inputField:valid ~ label {
-  top: -20px;
-  left: 0;
-  color: @login-button;
-  font-size: 12px;
 }
 
 .form-box button:hover {

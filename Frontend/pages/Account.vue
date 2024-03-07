@@ -246,7 +246,8 @@ definePageMeta({
               .input-field {
                 width: 100%;
                 display: block;
-                padding: 10px 0 10px 6px;
+                padding: 10px 0;
+                text-indent: 4px;
                 font-size: 16px;
                 color: @input-text;
                 border: none;
@@ -265,7 +266,7 @@ definePageMeta({
                 &:focus ~ label,
                 &:valid ~ label {
                   top: -25px;
-                  left: -8px;
+                  left: -4px;
                   color: @login-button;
                   font-size: 12px;
                 }
@@ -275,7 +276,7 @@ definePageMeta({
                 position: absolute;
                 top: 0;
                 left: 0;
-                padding: 10px 0 10px 8px;
+                padding: 10px 0 10px 4px;
                 font-size: 16px;
                 color: @input-text-placeholder;
                 pointer-events: none;
