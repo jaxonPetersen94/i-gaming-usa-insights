@@ -9,7 +9,12 @@
         <div class="content-wrapper">
           <div class="content-container">
             <div class="column">
-              <div class="user-profile-icon">
+              <input
+                class="account-picture"
+                type="button"
+                @mouseup="changeAccountPicture"
+              />
+              <div class="user-account-picture">
                 <font-awesome-icon icon="fa-solid fa-user" />
               </div>
               <span class="change-password" @mouseup="changePassword">
@@ -70,7 +75,7 @@
               </div>
             </div>
           </div>
-          <div class="save-changes-btn-container">
+          <div class="save-changes-btn-container" @mouseup="handleSaveChanges">
             <button>
               <span></span>
               <span></span>
@@ -95,12 +100,22 @@ export default {
   },
 
   setup() {
+    const changeAccountPicture = () => {
+      console.log('Open Account Picture change modal!');
+    };
+
     const changePassword = () => {
-      console.log('Open Change Password Modal!');
+      console.log('Open Password change modal!');
+    };
+
+    const handleSaveChanges = () => {
+      console.log('Changes saved!');
     };
 
     return {
+      changeAccountPicture,
       changePassword,
+      handleSaveChanges,
     };
   },
 };
@@ -170,7 +185,23 @@ definePageMeta({
             align-items: center;
             justify-content: space-between;
 
-            .user-profile-icon {
+            .account-picture {
+              margin: 0;
+              position: absolute;
+              width: 160px;
+              height: 160px;
+              border-radius: 50%;
+              border-width: 0;
+              background-color: transparent;
+              cursor: pointer;
+              z-index: 999;
+
+              &:active {
+                box-shadow: inset 0 0 20px 2px rgb(36, 36, 36);
+              }
+            }
+
+            .user-account-picture {
               display: flex;
               justify-content: center;
               align-items: center;
