@@ -335,6 +335,7 @@ export default {
         if (formType.value === 'Forgot Password') {
           landedAtLoginPage.value = false;
         } else {
+          oppositeFormText.value.classList.remove('opposite-form-text-fade-in');
           landedAtLoginPage.value = true;
         }
         oppositeFormText.value.removeEventListener(
