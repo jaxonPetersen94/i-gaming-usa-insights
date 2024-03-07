@@ -12,6 +12,9 @@
               <div class="user-profile-icon">
                 <font-awesome-icon icon="fa-solid fa-user" />
               </div>
+              <span class="change-password" @mouseup="changePassword">
+                <font-awesome-icon icon="fa-solid fa-key" />Change Password
+              </span>
             </div>
             <div class="input-column">
               <div class="input-container">
@@ -28,14 +31,14 @@
                 <label>First Name</label>
               </div>
               <div class="input-container">
-                <Field name="email" type="text" class="input-field" required />
-                <ErrorMessage name="email" class="form-validation-error-text" />
-                <label>Email</label>
+                <Field name="dob" type="text" class="input-field" required />
+                <ErrorMessage name="dob" class="form-validation-error-text" />
+                <label>Date of Birth</label>
               </div>
               <div class="input-container">
                 <Field name="???" type="text" class="input-field" required />
                 <ErrorMessage name="???" class="form-validation-error-text" />
-                <label>???</label>
+                <label>Email</label>
               </div>
             </div>
             <div class="input-column">
@@ -65,14 +68,8 @@
                 />
                 <label>Phone Number</label>
               </div>
-              <div class="input-container">
-                <Field name="???" type="text" class="input-field" required />
-                <ErrorMessage name="???" class="form-validation-error-text" />
-                <label>???</label>
-              </div>
             </div>
           </div>
-          <!-- SAVE BUTTON -->
           <div class="save-changes-btn-container">
             <button>
               <span></span>
@@ -82,7 +79,6 @@
               Save Changes
             </button>
           </div>
-          <!-- SAVE BUTTON -->
         </div>
       </div>
     </div>
@@ -96,6 +92,16 @@ export default {
   components: {
     Field,
     ErrorMessage,
+  },
+
+  setup() {
+    const changePassword = () => {
+      console.log('Open Change Password Modal!');
+    };
+
+    return {
+      changePassword,
+    };
   },
 };
 
@@ -160,7 +166,9 @@ definePageMeta({
 
           .column {
             display: flex;
-            justify-content: center;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
 
             .user-profile-icon {
               display: flex;
@@ -229,126 +237,133 @@ definePageMeta({
             }
           }
         }
-      }
 
-      .save-changes-btn-container {
-        display: flex;
-        float: right;
-        min-height: 40px;
-        margin: 16px 0;
-
-        button {
-          display: inline-block;
-          position: relative;
-          padding: 10px 20px;
-          color: @login-button;
-          background-color: transparent;
-          font-size: 16px;
-          text-decoration: none;
-          text-transform: uppercase;
-          overflow: hidden;
-          letter-spacing: 4px;
-          border: none;
+        .change-password {
+          display: flex;
+          gap: 8px;
           cursor: pointer;
-          transition: 0.5s;
+          transform: translateY(48px);
+        }
 
-          &:active {
-            transition: transform 0.2s;
-            transform: scale(0.9);
-          }
+        .save-changes-btn-container {
+          display: flex;
+          float: right;
+          min-height: 40px;
+          margin: 16px 0;
 
-          &:hover {
-            background: @login-button;
-            color: @white;
-            border-radius: 5px;
-            box-shadow:
-              0 0 4px @login-button,
-              0 0 8px @login-button,
-              0 0 16px @login-button,
-              0 0 32px @login-button-alt;
-          }
+          button {
+            display: inline-block;
+            position: relative;
+            padding: 10px 20px;
+            color: @login-button;
+            background-color: transparent;
+            font-size: 16px;
+            text-decoration: none;
+            text-transform: uppercase;
+            overflow: hidden;
+            letter-spacing: 4px;
+            border: none;
+            cursor: pointer;
+            transition: 0.5s;
 
-          span {
-            position: absolute;
-            display: block;
-          }
+            &:active {
+              transition: transform 0.2s;
+              transform: scale(0.9);
+            }
 
-          span:nth-child(1) {
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, @login-button);
-            animation: btn-anim1 1s linear infinite;
-          }
+            &:hover {
+              background: @login-button;
+              color: @white;
+              border-radius: 5px;
+              box-shadow:
+                0 0 4px @login-button,
+                0 0 8px @login-button,
+                0 0 16px @login-button,
+                0 0 32px @login-button-alt;
+            }
 
-          @keyframes btn-anim1 {
-            0% {
+            span {
+              position: absolute;
+              display: block;
+            }
+
+            span:nth-child(1) {
+              top: 0;
               left: -100%;
+              width: 100%;
+              height: 2px;
+              background: linear-gradient(90deg, transparent, @login-button);
+              animation: btn-anim1 1s linear infinite;
             }
-            50%,
-            100% {
-              left: 100%;
+
+            @keyframes btn-anim1 {
+              0% {
+                left: -100%;
+              }
+              50%,
+              100% {
+                left: 100%;
+              }
             }
-          }
 
-          span:nth-child(2) {
-            top: -100%;
-            right: 0;
-            width: 2px;
-            height: 100%;
-            background: linear-gradient(180deg, transparent, @login-button);
-            animation: btn-anim2 1s linear infinite;
-            animation-delay: 0.25s;
-          }
-
-          @keyframes btn-anim2 {
-            0% {
+            span:nth-child(2) {
               top: -100%;
+              right: 0;
+              width: 2px;
+              height: 100%;
+              background: linear-gradient(180deg, transparent, @login-button);
+              animation: btn-anim2 1s linear infinite;
+              animation-delay: 0.25s;
             }
-            50%,
-            100% {
-              top: 100%;
+
+            @keyframes btn-anim2 {
+              0% {
+                top: -100%;
+              }
+              50%,
+              100% {
+                top: 100%;
+              }
             }
-          }
 
-          span:nth-child(3) {
-            bottom: 0;
-            right: -100%;
-            width: 100%;
-            height: 2px;
-            background: linear-gradient(270deg, transparent, @login-button);
-            animation: btn-anim3 1s linear infinite;
-            animation-delay: 0.5s;
-          }
-
-          @keyframes btn-anim3 {
-            0% {
+            span:nth-child(3) {
+              bottom: 0;
               right: -100%;
+              width: 100%;
+              height: 2px;
+              background: linear-gradient(270deg, transparent, @login-button);
+              animation: btn-anim3 1s linear infinite;
+              animation-delay: 0.5s;
             }
-            50%,
-            100% {
-              right: 100%;
+
+            @keyframes btn-anim3 {
+              0% {
+                right: -100%;
+              }
+              50%,
+              100% {
+                right: 100%;
+              }
             }
-          }
 
-          span:nth-child(4) {
-            bottom: -100%;
-            left: 0;
-            width: 2px;
-            height: 100%;
-            background: linear-gradient(360deg, transparent, @login-button);
-            animation: btn-anim4 1s linear infinite;
-            animation-delay: 0.75s;
-          }
-
-          @keyframes btn-anim4 {
-            0% {
+            span:nth-child(4) {
               bottom: -100%;
+              left: 0;
+              width: 2px;
+              height: 100%;
+              background: linear-gradient(360deg, transparent, @login-button);
+              animation: btn-anim4 1s linear infinite;
+              animation-delay: 0.75s;
             }
-            50%,
-            100% {
-              bottom: 100%;
+
+            @keyframes btn-anim4 {
+              0% {
+                bottom: -100%;
+              }
+              50%,
+              100% {
+                bottom: 100%;
+              }
             }
           }
         }
