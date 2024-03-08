@@ -143,12 +143,19 @@ export default {
       const value = event.target.value;
       let formattedValue = '';
 
-      if (/^\d+$/.test(char)) {
-        if (value.length === 2 || value.length === 5) {
-          formattedValue = value + '-';
-        } else {
-          formattedValue = value;
+      const charIsDigit = /^\d+$/.test(char);
+      if (charIsDigit) {
+        const charInt = parseInt(char);
+        if (
+          (value.length === 0 && charInt > 1) ||
+          ((value.length === 2 || value.length === 3) && charInt > 3) ||
+          ((value.length === 5 || value.length === 6) && charInt > 2)
+        ) {
+          event.preventDefault();
+          return;
         }
+        formattedValue =
+          value.length === 2 || value.length === 5 ? value + '-' : value;
       } else if (
         (char === '-' || char === '/') &&
         (value.length === 2 || value.length === 5)
@@ -170,8 +177,6 @@ export default {
 
     const handleDateOfBirthBackspace = (event: any) => {
       const value = event.target.value;
-      let formattedValue = '';
-
       if (event.key === 'Backspace') {
         if (value.length === 3 || value.length === 6) {
           event.target.value = value.slice(0, -1);
@@ -184,7 +189,8 @@ export default {
       let value = event.target.value;
       let formattedValue = '';
 
-      if (/^\d+$/.test(char)) {
+      const charIsDigit = /^\d+$/.test(char);
+      if (charIsDigit) {
         if (value.length === 2) {
           formattedValue = `(${value + char}) `;
           event.preventDefault();
@@ -209,8 +215,6 @@ export default {
 
     const handlePhoneNumberBackspace = (event: any) => {
       let value = event.target.value;
-      let formattedValue = '';
-
       if (event.key === 'Backspace') {
         if (value.length === 6) {
           value = value.slice(0, -2);

@@ -776,7 +776,7 @@ export default {
     outline: none;
     background: transparent;
     cursor: default;
-    text-indent: 4px;
+    text-indent: 1px;
 
     &:-webkit-autofill {
       -webkit-background-clip: text;
