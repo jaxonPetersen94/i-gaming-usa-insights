@@ -38,10 +38,12 @@
               </div>
               <div class="input-container">
                 <Field
+                  ref="dateOfBirthInput"
                   name="date-of-birth"
                   type="text"
                   class="input-field"
                   @keypress="handleDateOfBirthInput"
+                  @paste="handleDateOfBirthInputPaste"
                   @keydown="handleDateOfBirthBackspace"
                   maxlength="10"
                   required
@@ -81,10 +83,12 @@
               </div>
               <div class="input-container">
                 <Field
+                  ref="phoneNumberInput"
                   name="phoneNumber"
                   type="text"
                   class="input-field"
                   @keypress="handlePhoneNumberInput"
+                  @paste="handlePhoneNumberInputPaste"
                   @keydown="handlePhoneNumberBackspace"
                   maxlength="14"
                   required
@@ -123,6 +127,9 @@ export default {
   },
 
   setup() {
+    const dateOfBirthInput = ref<HTMLElement | null>(null);
+    const phoneNumberInput = ref<HTMLElement | null>(null);
+
     const userStore = useUserStore();
     const user = userStore.user;
 
@@ -171,7 +178,25 @@ export default {
         }
         formattedValue = value;
       }
+      event.target.value = formattedValue;
+    };
 
+    const handleDateOfBirthInputPaste = (event: any) => {
+      event.preventDefault();
+      const pastedText = event.clipboardData.getData('text/plain');
+      const cleanedDigits = pastedText.replace(/\D/g, '');
+      const truncatedDigits = cleanedDigits.slice(0, 8);
+
+      let formattedValue = '';
+      for (let i = 0; i < truncatedDigits.length; i++) {
+        const char = truncatedDigits[i];
+
+        if (i === 2 || i === 4) {
+          formattedValue += '-';
+        }
+
+        formattedValue += char;
+      }
       event.target.value = formattedValue;
     };
 
@@ -209,8 +234,31 @@ export default {
         }
         formattedValue = value;
       }
-
       event.target.value = formattedValue;
+    };
+
+    const handlePhoneNumberInputPaste = (event: any) => {
+      event.preventDefault();
+
+      const pastedText = event.clipboardData.getData('text/plain');
+      const cleanedDigits = pastedText.replace(/\D/g, '');
+      const truncatedDigits = cleanedDigits.slice(0, 10);
+
+      let formattedNumber;
+      if (truncatedDigits.length >= 6) {
+        formattedNumber = `(${truncatedDigits.slice(
+          0,
+          3,
+        )}) ${truncatedDigits.slice(3, 6)}-${truncatedDigits.slice(6, 10)}`;
+      } else if (truncatedDigits.length >= 3) {
+        formattedNumber = `(${truncatedDigits.slice(
+          0,
+          3,
+        )}) ${truncatedDigits.slice(3, 6)}`;
+      } else {
+        formattedNumber = truncatedDigits;
+      }
+      event.target.value = formattedNumber;
     };
 
     const handlePhoneNumberBackspace = (event: any) => {
@@ -227,13 +275,17 @@ export default {
     };
 
     return {
+      dateOfBirthInput,
+      phoneNumberInput,
       user,
       changeAccountPicture,
       changePassword,
       handleSaveChanges,
       handleDateOfBirthInput,
+      handleDateOfBirthInputPaste,
       handleDateOfBirthBackspace,
       handlePhoneNumberInput,
+      handlePhoneNumberInputPaste,
       handlePhoneNumberBackspace,
     };
   },
