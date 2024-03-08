@@ -37,8 +37,19 @@
                 <label>First Name</label>
               </div>
               <div class="input-container">
-                <Field name="dob" type="text" class="input-field" required />
-                <ErrorMessage name="dob" class="form-validation-error-text" />
+                <Field
+                  name="date-of-birth"
+                  type="text"
+                  class="input-field"
+                  @keypress="handleDateOfBirthInput"
+                  @keydown="handleDateOfBirthBackspace"
+                  maxlength="10"
+                  required
+                />
+                <ErrorMessage
+                  name="date-of-birth"
+                  class="form-validation-error-text"
+                />
                 <label>Date of Birth</label>
               </div>
               <div class="input-container">
@@ -73,6 +84,9 @@
                   name="phoneNumber"
                   type="text"
                   class="input-field"
+                  @keypress="handlePhoneNumberInput"
+                  @keydown="handlePhoneNumberBackspace"
+                  maxlength="14"
                   required
                 />
                 <ErrorMessage
@@ -124,11 +138,99 @@ export default {
       console.log('Changes saved!');
     };
 
+    const handleDateOfBirthInput = (event: any) => {
+      const char = event.key;
+      const value = event.target.value;
+      let formattedValue = '';
+
+      if (/^\d+$/.test(char)) {
+        if (value.length === 2 || value.length === 5) {
+          formattedValue = value + '-';
+        } else {
+          formattedValue = value;
+        }
+      } else if (
+        (char === '-' || char === '/') &&
+        (value.length === 2 || value.length === 5)
+      ) {
+        formattedValue = `${value}-`;
+        event.preventDefault();
+      } else {
+        const arrowKeysPressed =
+          event.key === 'ArrowLeft' || event.key === 'ArrowRight';
+        if (!arrowKeysPressed) {
+          event.preventDefault();
+          return;
+        }
+        formattedValue = value;
+      }
+
+      event.target.value = formattedValue;
+    };
+
+    const handleDateOfBirthBackspace = (event: any) => {
+      const value = event.target.value;
+      let formattedValue = '';
+
+      if (event.key === 'Backspace') {
+        if (value.length === 3 || value.length === 6) {
+          event.target.value = value.slice(0, -1);
+        }
+      }
+    };
+
+    const handlePhoneNumberInput = (event: any) => {
+      const char = event.key;
+      let value = event.target.value;
+      let formattedValue = '';
+
+      if (/^\d+$/.test(char)) {
+        if (value.length === 2) {
+          formattedValue = `(${value + char}) `;
+          event.preventDefault();
+        } else if (value.length === 8) {
+          formattedValue = value + char + '-';
+          event.preventDefault();
+        } else {
+          formattedValue = value;
+        }
+      } else {
+        const arrowKeysPressed =
+          event.key === 'ArrowLeft' || event.key === 'ArrowRight';
+        if (!arrowKeysPressed) {
+          event.preventDefault();
+          return;
+        }
+        formattedValue = value;
+      }
+
+      event.target.value = formattedValue;
+    };
+
+    const handlePhoneNumberBackspace = (event: any) => {
+      let value = event.target.value;
+      let formattedValue = '';
+
+      if (event.key === 'Backspace') {
+        if (value.length === 6) {
+          value = value.slice(0, -2);
+          event.target.value = value.slice(1);
+        }
+        if (value.length === 10) {
+          event.target.value = value.slice(0, -1);
+        }
+      }
+    };
+
     return {
       user,
       changeAccountPicture,
       changePassword,
       handleSaveChanges,
+      handleDateOfBirthInput,
+      handleDateOfBirthBackspace,
+      handlePhoneNumberInput,
+      handlePhoneNumberBackspace,
     };
   },
 };
