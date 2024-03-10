@@ -6,7 +6,7 @@
           <font-awesome-icon icon="fa-solid fa-gear" />Account
         </span>
         <hr class="line-break" />
-        <div class="content-wrapper">
+        <Form ref="form" class="vee-validate-form" @submit="handleSaveChanges">
           <div class="content-container">
             <div class="column">
               <input
@@ -42,6 +42,7 @@
                   name="date-of-birth"
                   type="text"
                   class="input-field"
+                  :value="user.dob"
                   @keypress="handleDateOfBirthInput"
                   @paste="handleDateOfBirthInputPaste"
                   @keydown="handleDateOfBirthBackspace"
@@ -87,6 +88,7 @@
                   name="phoneNumber"
                   type="text"
                   class="input-field"
+                  :value="formattedPhoneNumber"
                   @keypress="handlePhoneNumberInput"
                   @paste="handlePhoneNumberInputPaste"
                   @keydown="handlePhoneNumberBackspace"
@@ -101,7 +103,7 @@
               </div>
             </div>
           </div>
-          <div class="save-changes-btn-container" @mouseup="handleSaveChanges">
+          <div class="save-changes-btn-container">
             <button>
               <span></span>
               <span></span>
@@ -110,18 +112,22 @@
               Save Changes
             </button>
           </div>
-        </div>
+        </Form>
       </div>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { Field, ErrorMessage } from 'vee-validate';
+import { Field, Form, ErrorMessage } from 'vee-validate';
+import Preloader from '@/components/Preloader.vue';
 import { useUserStore } from '../stores/store';
+import type { User } from '~/types/User/types';
 
 export default {
   components: {
+    Preloader,
+    Form,
     Field,
     ErrorMessage,
   },
@@ -141,8 +147,17 @@ export default {
       console.log('Open Password change modal!');
     };
 
-    const handleSaveChanges = () => {
-      console.log('Changes saved!');
+    const handleSaveChanges = async (values: any, actions: any) => {
+      const phoneNumber = `+1${values.phoneNumber.replace(/\D/g, '')}`;
+      const updatedUser: User = {
+        firebaseUid: user.firebaseUid,
+        firstName: values.firstName,
+        lastName: values.lastName,
+        dob: values['date-of-birth'],
+        phoneNumber,
+        email: values.email,
+      };
+      await userStore.updateUser(updatedUser);
     };
 
     const handleDateOfBirthInput = (event: any) => {
@@ -274,6 +289,28 @@ export default {
       }
     };
 
+    const formattedPhoneNumber = computed(() => {
+      return user.phoneNumber ? formatPhoneNumber(user.phoneNumber) : '';
+    });
+
+    function formatPhoneNumber(phoneNumber: string): string | null {
+      const numericPhoneNumber = phoneNumber.replace(/\D/g, '');
+
+      if (numericPhoneNumber.length !== 11) {
+        console.error('Invalid phone number length');
+        return null;
+      }
+      const areaCode = numericPhoneNumber.substring(1, 4);
+      const localNumber = numericPhoneNumber.substring(4);
+
+      const formattedPhoneNumber = `(${areaCode}) ${localNumber.substring(
+        0,
+        3,
+      )}-${localNumber.substring(3)}`;
+
+      return formattedPhoneNumber;
+    }
+
     return {
       dateOfBirthInput,
       phoneNumberInput,
@@ -287,6 +324,7 @@ export default {
       handlePhoneNumberInput,
       handlePhoneNumberInputPaste,
       handlePhoneNumberBackspace,
+      formattedPhoneNumber,
     };
   },
 };
@@ -342,7 +380,7 @@ definePageMeta({
         }
       }
 
-      .content-wrapper {
+      .vee-validate-form {
         margin: 24px 16px 0 16px;
 
         .content-container {

@@ -1,5 +1,7 @@
-import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
+import { initializeApp } from 'firebase/app';
+import admin from 'firebase-admin';
+import serviceAccount from './config/firebase-admin-service-account-key.json' assert { type: 'json' };
 
 const firebaseConfig = {
   apiKey: 'AIzaSyDUa7wiM3jpYc6utd9PyySBz4t-Ie2gRsw',
@@ -12,3 +14,10 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount as any),
+  // databaseURL: 'https://your-project-id.firebaseio.com', // Replace with your Firebase project's database URL
+});
+
+export { admin };

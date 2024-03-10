@@ -9,3 +9,12 @@ export interface RegisterUserForm {
   email: string;
   password: string;
 }
+
+export interface DbUser {
+  firebaseUid: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  dob?: string;
+  phoneNumber?: string;
+}

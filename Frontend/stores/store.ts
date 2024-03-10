@@ -4,29 +4,32 @@ import APP_CONST from '~/constants/appConstants';
 
 export const useUserStore = defineStore('user', () => {
   const user = ref({} as User);
+  const firebaseUser = ref({} as any);
   const loginProcessing = ref(false);
   const loginSuccessful = ref(false);
+  const userUpdateProcessing = ref(false);
+  const userUpdateSuccessful = ref(false);
   const errorMsg = ref('');
   const forgotPasswordEmailSent = ref(false);
 
   const userIsAuthenticated = (): boolean => {
-    return !!user.value.accessToken;
+    return !!firebaseUser.value.stsTokenManager?.accessToken;
   };
 
   async function signInUser(userLoginData: any): Promise<boolean> {
     try {
       loginProcessing.value = true;
-      const data: User = await $fetch(APP_CONST.API_USER_LOGIN, {
+      const data: any = await $fetch(APP_CONST.API_USER_LOGIN, {
         method: 'post',
         body: userLoginData,
       });
       loginSuccessful.value = true;
+      firebaseUser.value = data.firebaseUser;
       user.value = {
         firebaseUid: data.firebaseUid,
         firstName: data.firstName,
         lastName: data.lastName,
         email: data.email,
-        accessToken: data.accessToken,
       };
       return true;
     } catch (error: any) {
@@ -53,17 +56,17 @@ export const useUserStore = defineStore('user', () => {
   ): Promise<boolean> {
     try {
       loginProcessing.value = true;
-      const data: User = await $fetch(APP_CONST.API_USER_REGISTER, {
+      const data: any = await $fetch(APP_CONST.API_USER_REGISTER, {
         method: 'post',
         body: newUserData,
       });
       loginSuccessful.value = true;
+      firebaseUser.value = data.firebaseUser;
       user.value = {
         firebaseUid: data.firebaseUid,
         firstName: data.firstName,
         lastName: data.lastName,
         email: data.email,
-        accessToken: data.accessToken,
       };
       return true;
     } catch (error: any) {
@@ -76,6 +79,42 @@ export const useUserStore = defineStore('user', () => {
       return false;
     } finally {
       loginProcessing.value = false;
+    }
+  }
+
+  async function updateUser(updatedUserData: User): Promise<boolean> {
+    try {
+      userUpdateProcessing.value = true;
+      const superUser = {
+        ...updatedUserData,
+        firebaseUser: firebaseUser.value,
+      };
+      const data: any = await $fetch(APP_CONST.API_USER_UPDATE, {
+        method: 'post',
+        body: superUser,
+      });
+      userUpdateSuccessful.value = true;
+      user.value = {
+        firebaseUid: data.firebaseUid,
+        email: data.email,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        ...(data.dob && { dob: data.dob }),
+        ...(data.phoneNumber && {
+          phoneNumber: data.phoneNumber,
+        }),
+      };
+      return true;
+    } catch (error: any) {
+      userUpdateSuccessful.value = false;
+      if (error.response) {
+        errorMsg.value = error.response._data.code;
+      } else {
+        errorMsg.value = 'FetchError: Failed to fetch';
+      }
+      return false;
+    } finally {
+      userUpdateProcessing.value = false;
     }
   }
 
@@ -107,6 +146,7 @@ export const useUserStore = defineStore('user', () => {
     signInUser,
     signOutUser,
     registerUser,
+    updateUser,
     forgotPassword,
   };
 });

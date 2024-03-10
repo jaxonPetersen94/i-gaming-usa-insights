@@ -3,23 +3,25 @@ import {
   login,
   logOut,
   register,
+  updateFirebaseUser,
   forgotPassword,
 } from '../controllers/AuthController.js';
 import { mongoDatabase } from '../app.js';
+import { DbUser } from '../models/User.js';
 
 const router = express.Router();
 
-router.post('/api/login', async (req: Request, res: Response) => {
+router.post('/api/auth/login', async (req: Request, res: Response) => {
   try {
     const user = req.body;
     const response = await login(user);
-    const mongoUser = await mongoDatabase.collection('Users').findOne({
+    const dbUser = await mongoDatabase.collection('Users').findOne({
       $or: [{ email: response.user.email }, { firebaseUid: response.user.uid }],
     });
-    if (mongoUser) {
+    if (dbUser) {
       const returnedUser = {
-        ...mongoUser,
-        accessToken: (response.user as any).stsTokenManager.accessToken,
+        ...dbUser,
+        firebaseUser: response.user,
       };
       res.status(200).send(returnedUser);
     } else {
@@ -30,7 +32,7 @@ router.post('/api/login', async (req: Request, res: Response) => {
   }
 });
 
-router.post('/api/logout', async (req: Request, res: Response) => {
+router.post('/api/auth/logout', async (req: Request, res: Response) => {
   try {
     await logOut();
     res.status(200).end();
@@ -39,20 +41,20 @@ router.post('/api/logout', async (req: Request, res: Response) => {
   }
 });
 
-router.post('/api/register', async (req: Request, res: Response) => {
+router.post('/api/auth/register', async (req: Request, res: Response) => {
   try {
     const newUser = req.body;
     const response = await register(newUser);
-    const newUserDbEntry = {
+    const newDbUser = {
       firebaseUid: response.user.uid,
       email: response.user.email,
       firstName: req.body.firstName,
       lastName: req.body.lastName,
     };
-    await mongoDatabase.collection('Users').insertOne(newUserDbEntry);
+    await mongoDatabase.collection('Users').insertOne(newDbUser);
     const returnedUser = {
-      ...newUserDbEntry,
-      accessToken: (response.user as any).stsTokenManager.accessToken,
+      ...newDbUser,
+      firebaseUser: response.user,
     };
     res.status(200).send(returnedUser);
   } catch (error) {
@@ -60,7 +62,36 @@ router.post('/api/register', async (req: Request, res: Response) => {
   }
 });
 
-router.post('/api/forgotPassword', async (req: Request, res: Response) => {
+router.post('/api/auth/updateUser', async (req: Request, res: Response) => {
+  try {
+    const { firebaseUser, ...updatedUserInfo } = req.body;
+    const updatedFirebaseUser = await updateFirebaseUser(updatedUserInfo);
+    const updatedDbUser: DbUser = {
+      firebaseUid: updatedUserInfo.firebaseUid,
+      email: updatedFirebaseUser.email,
+      firstName: updatedUserInfo.firstName,
+      lastName: updatedUserInfo.lastName,
+      ...(updatedUserInfo.dob && { dob: updatedUserInfo.dob }),
+      ...(updatedFirebaseUser.phoneNumber && {
+        phoneNumber: updatedFirebaseUser.phoneNumber,
+      }),
+    };
+    const dbFilter = { firebaseUid: updatedDbUser.firebaseUid };
+    await mongoDatabase.collection('Users').updateOne(dbFilter, {
+      $set: updatedDbUser,
+    });
+    const returnedUser = {
+      ...updatedDbUser,
+      accessToken: updatedUserInfo.accessToken,
+    };
+    res.status(200).send(returnedUser);
+  } catch (error) {
+    console.log('error!@ =', error);
+    res.status(500).json(error);
+  }
+});
+
+router.post('/api/auth/forgotPassword', async (req: Request, res: Response) => {
   try {
     const email = req.body.email;
     const response = await forgotPassword(email);

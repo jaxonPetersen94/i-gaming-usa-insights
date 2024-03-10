@@ -36,3 +36,6 @@ dist
 .DS_Store
 .fleet
 .idea
+
+# Ignore Firebase-Admin Config
+Backend/Authentication/src/config/firebase-admin-service-account-key.json

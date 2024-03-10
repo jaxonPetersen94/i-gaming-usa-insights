@@ -183,7 +183,7 @@ import { ref, onMounted, computed } from 'vue';
 import Preloader from '@/components/Preloader.vue';
 import TextScramble from '@/utilities/textScrambler';
 import type { RegisterUserForm } from '@/types/User/types';
-import { Form, Field, ErrorMessage } from 'vee-validate';
+import { ErrorMessage, Field, Form } from 'vee-validate';
 import { useUserStore } from '../stores/store';
 import { useRouter } from 'vue-router';
 
