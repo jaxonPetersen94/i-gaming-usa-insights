@@ -15,6 +15,6 @@ export interface DbUser {
   firstName: string;
   lastName: string;
   email: string;
-  dob?: string;
-  phoneNumber?: string;
+  dob?: string | null;
+  phoneNumber?: string | null;
 }

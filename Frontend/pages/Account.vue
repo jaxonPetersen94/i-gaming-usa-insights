@@ -134,11 +134,10 @@ export default {
   },
 
   setup() {
+    const userStore = useUserStore();
+
     const dateOfBirthInput = ref<HTMLElement | null>(null);
     const phoneNumberInput = ref<HTMLElement | null>(null);
-
-    const userStore = useUserStore();
-    const user = userStore.user;
 
     const changeAccountPicture = () => {
       console.log('Open Account Picture change modal!');
@@ -149,15 +148,22 @@ export default {
     };
 
     const handleSaveChanges = async (values: any, actions: any) => {
-      const phoneNumber = `+1${values.phoneNumber.replace(/\D/g, '')}`;
       const updatedUser: User = {
-        firebaseUid: user.firebaseUid,
+        firebaseUid: user.value.firebaseUid,
         firstName: values.firstName,
         lastName: values.lastName,
-        dob: values['date-of-birth'],
-        phoneNumber,
         email: values.email,
-        accessToken: user.accessToken,
+        dob: values['date-of-birth']
+          ? values['date-of-birth']
+          : user.value.dob
+            ? null
+            : undefined,
+        phoneNumber: values.phoneNumber
+          ? `+1${values.phoneNumber.replace(/\D/g, '')}`
+          : user.value.phoneNumber
+            ? null
+            : undefined,
+        accessToken: user.value.accessToken,
       };
       await userStore.updateUser(updatedUser);
     };
@@ -291,8 +297,18 @@ export default {
       }
     };
 
+    const user = computed(() => {
+      return userStore.user;
+    });
+
+    const userUpdateProcessing = computed(() => {
+      return userStore.userUpdateProcessing;
+    });
+
     const formattedPhoneNumber = computed(() => {
-      return user.phoneNumber ? formatPhoneNumber(user.phoneNumber) : '';
+      return user.value.phoneNumber
+        ? formatPhoneNumber(user.value.phoneNumber)
+        : '';
     });
 
     function formatPhoneNumber(phoneNumber: string): string | null {
@@ -313,14 +329,9 @@ export default {
       return formattedPhoneNumber;
     }
 
-    const userUpdateProcessing = computed(() => {
-      return userStore.userUpdateProcessing;
-    });
-
     return {
       dateOfBirthInput,
       phoneNumberInput,
-      user,
       changeAccountPicture,
       changePassword,
       handleSaveChanges,
@@ -330,8 +341,9 @@ export default {
       handlePhoneNumberInput,
       handlePhoneNumberInputPaste,
       handlePhoneNumberBackspace,
-      formattedPhoneNumber,
+      user,
       userUpdateProcessing,
+      formattedPhoneNumber,
     };
   },
 };

@@ -88,12 +88,9 @@ export const useUserStore = defineStore('user', () => {
   async function updateUser(updatedUserData: User): Promise<boolean> {
     try {
       userUpdateProcessing.value = true;
-      const superUser = {
-        ...updatedUserData,
-      };
       const data: any = await $fetch(APP_CONST.API_USER_UPDATE, {
         method: 'post',
-        body: superUser,
+        body: updatedUserData,
       });
       userUpdateSuccessful.value = true;
       user.value = {

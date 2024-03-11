@@ -64,7 +64,7 @@ router.post('/api/auth/register', async (req: Request, res: Response) => {
 
 router.post('/api/auth/updateUser', async (req: Request, res: Response) => {
   try {
-    const { firebaseUser, ...updatedUserInfo } = req.body;
+    const updatedUserInfo = req.body;
     const updatedFirebaseUser = await updateFirebaseUser(updatedUserInfo);
     const updatedDbUser: DbUser = {
       firebaseUid: updatedUserInfo.firebaseUid,
@@ -80,6 +80,19 @@ router.post('/api/auth/updateUser', async (req: Request, res: Response) => {
     await mongoDatabase.collection('Users').updateOne(dbFilter, {
       $set: updatedDbUser,
     });
+    if (
+      updatedUserInfo.phoneNumber === null &&
+      updatedFirebaseUser.phoneNumber === undefined
+    ) {
+      await mongoDatabase.collection('Users').updateOne(dbFilter, {
+        $unset: { phoneNumber: true },
+      });
+    }
+    if (updatedUserInfo.dob === null) {
+      await mongoDatabase.collection('Users').updateOne(dbFilter, {
+        $unset: { dob: true },
+      });
+    }
     const returnedUser = {
       ...updatedDbUser,
       accessToken: updatedUserInfo.accessToken,
