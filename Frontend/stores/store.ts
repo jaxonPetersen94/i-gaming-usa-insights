@@ -84,6 +84,7 @@ export const useUserStore = defineStore('user', () => {
 
   async function updateUser(updatedUserData: User): Promise<boolean> {
     try {
+      console.log('updateUser()');
       userUpdateProcessing.value = true;
       const superUser = {
         ...updatedUserData,
@@ -104,6 +105,7 @@ export const useUserStore = defineStore('user', () => {
           phoneNumber: data.phoneNumber,
         }),
       };
+      console.log('User updated!');
       return true;
     } catch (error: any) {
       userUpdateSuccessful.value = false;
@@ -140,6 +142,8 @@ export const useUserStore = defineStore('user', () => {
     user,
     loginProcessing,
     loginSuccessful,
+    userUpdateProcessing,
+    userUpdateSuccessful,
     errorMsg,
     forgotPasswordEmailSent,
     userIsAuthenticated,

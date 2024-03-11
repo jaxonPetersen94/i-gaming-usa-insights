@@ -104,13 +104,14 @@
             </div>
           </div>
           <div class="save-changes-btn-container">
-            <button>
+            <button v-if="!userUpdateProcessing">
               <span></span>
               <span></span>
               <span></span>
               <span></span>
               Save Changes
             </button>
+            <Preloader v-else />
           </div>
         </Form>
       </div>
@@ -311,6 +312,10 @@ export default {
       return formattedPhoneNumber;
     }
 
+    const userUpdateProcessing = computed(() => {
+      return userStore.userUpdateProcessing;
+    });
+
     return {
       dateOfBirthInput,
       phoneNumberInput,
@@ -325,6 +330,7 @@ export default {
       handlePhoneNumberInputPaste,
       handlePhoneNumberBackspace,
       formattedPhoneNumber,
+      userUpdateProcessing,
     };
   },
 };
@@ -610,6 +616,12 @@ definePageMeta({
                 bottom: 100%;
               }
             }
+          }
+
+          div {
+            display: flex;
+            align-items: center;
+            padding: 0 69.54px;
           }
         }
       }
