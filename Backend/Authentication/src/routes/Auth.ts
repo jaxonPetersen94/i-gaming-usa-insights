@@ -21,7 +21,7 @@ router.post('/api/auth/login', async (req: Request, res: Response) => {
     if (dbUser) {
       const returnedUser = {
         ...dbUser,
-        firebaseUser: response.user,
+        accessToken: (response.user as any).stsTokenManager.accessToken,
       };
       res.status(200).send(returnedUser);
     } else {
@@ -54,7 +54,7 @@ router.post('/api/auth/register', async (req: Request, res: Response) => {
     await mongoDatabase.collection('Users').insertOne(newDbUser);
     const returnedUser = {
       ...newDbUser,
-      firebaseUser: response.user,
+      accessToken: (response.user as any).stsTokenManager.accessToken,
     };
     res.status(200).send(returnedUser);
   } catch (error) {
@@ -86,7 +86,6 @@ router.post('/api/auth/updateUser', async (req: Request, res: Response) => {
     };
     res.status(200).send(returnedUser);
   } catch (error) {
-    console.log('error!@ =', error);
     res.status(500).json(error);
   }
 });

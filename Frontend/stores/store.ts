@@ -4,7 +4,6 @@ import APP_CONST from '~/constants/appConstants';
 
 export const useUserStore = defineStore('user', () => {
   const user = ref({} as User);
-  const firebaseUser = ref({} as any);
   const loginProcessing = ref(false);
   const loginSuccessful = ref(false);
   const userUpdateProcessing = ref(false);
@@ -13,7 +12,7 @@ export const useUserStore = defineStore('user', () => {
   const forgotPasswordEmailSent = ref(false);
 
   const userIsAuthenticated = (): boolean => {
-    return !!firebaseUser.value.stsTokenManager?.accessToken;
+    return !!user.value.accessToken;
   };
 
   async function signInUser(userLoginData: any): Promise<boolean> {
@@ -24,12 +23,16 @@ export const useUserStore = defineStore('user', () => {
         body: userLoginData,
       });
       loginSuccessful.value = true;
-      firebaseUser.value = data.firebaseUser;
       user.value = {
         firebaseUid: data.firebaseUid,
         firstName: data.firstName,
         lastName: data.lastName,
         email: data.email,
+        ...(data.dob && { dob: data.dob }),
+        ...(data.phoneNumber && {
+          phoneNumber: data.phoneNumber,
+        }),
+        accessToken: data.accessToken,
       };
       return true;
     } catch (error: any) {
@@ -61,12 +64,12 @@ export const useUserStore = defineStore('user', () => {
         body: newUserData,
       });
       loginSuccessful.value = true;
-      firebaseUser.value = data.firebaseUser;
       user.value = {
         firebaseUid: data.firebaseUid,
         firstName: data.firstName,
         lastName: data.lastName,
         email: data.email,
+        accessToken: data.accessToken,
       };
       return true;
     } catch (error: any) {
@@ -84,11 +87,9 @@ export const useUserStore = defineStore('user', () => {
 
   async function updateUser(updatedUserData: User): Promise<boolean> {
     try {
-      console.log('updateUser()');
       userUpdateProcessing.value = true;
       const superUser = {
         ...updatedUserData,
-        firebaseUser: firebaseUser.value,
       };
       const data: any = await $fetch(APP_CONST.API_USER_UPDATE, {
         method: 'post',
@@ -104,8 +105,8 @@ export const useUserStore = defineStore('user', () => {
         ...(data.phoneNumber && {
           phoneNumber: data.phoneNumber,
         }),
+        accessToken: data.accessToken,
       };
-      console.log('User updated!');
       return true;
     } catch (error: any) {
       userUpdateSuccessful.value = false;

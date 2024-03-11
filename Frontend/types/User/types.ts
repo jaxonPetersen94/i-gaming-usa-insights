@@ -25,4 +25,5 @@ export interface User {
   email: string;
   dob?: string;
   phoneNumber?: string;
+  accessToken: string;
 }

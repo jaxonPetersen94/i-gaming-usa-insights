@@ -157,6 +157,7 @@ export default {
         dob: values['date-of-birth'],
         phoneNumber,
         email: values.email,
+        accessToken: user.accessToken,
       };
       await userStore.updateUser(updatedUser);
     };
