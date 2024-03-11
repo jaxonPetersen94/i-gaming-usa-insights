@@ -12,12 +12,12 @@
               <input
                 class="account-picture"
                 type="button"
-                @mouseup="changeAccountPicture"
+                @click="changeAccountPicture"
               />
               <div class="user-account-picture">
                 <font-awesome-icon icon="fa-solid fa-user" />
               </div>
-              <span class="change-password" @mouseup="changePassword">
+              <span class="change-password" @click="changePassword">
                 <font-awesome-icon icon="fa-solid fa-key" />Change Password
               </span>
             </div>
