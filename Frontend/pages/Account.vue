@@ -121,18 +121,21 @@
         </Form>
       </div>
     </div>
+    <PopUpModal v-if="isModalOpen" />
   </div>
 </template>
 
 <script lang="ts">
 import { Field, Form, ErrorMessage } from 'vee-validate';
 import Preloader from '@/components/Preloader.vue';
+import PopUpModal from '~/components/PopUpModal.vue';
 import { useUserStore } from '../stores/store';
 import type { User } from '~/types/User/types';
 
 export default {
   components: {
     Preloader,
+    PopUpModal,
     Form,
     Field,
     ErrorMessage,
@@ -141,10 +144,17 @@ export default {
   setup() {
     const dateOfBirthInput = ref<HTMLElement | null>(null);
     const phoneNumberInput = ref<HTMLElement | null>(null);
+    const isModalOpen = ref(false);
     const userStore = useUserStore();
 
+    definePageMeta({
+      middleware: 'auth',
+    });
+
     const changeAccountPicture = () => {
-      console.log('Open Account Picture change modal!');
+      console.log('changeAccountPicture()');
+      isModalOpen.value = true;
+      console.log('isModalOpen.value =', isModalOpen.value);
     };
 
     const changePassword = () => {
@@ -392,6 +402,7 @@ export default {
     return {
       dateOfBirthInput,
       phoneNumberInput,
+      isModalOpen,
       changeAccountPicture,
       changePassword,
       handleSaveChanges,
@@ -413,10 +424,6 @@ export default {
     };
   },
 };
-
-definePageMeta({
-  middleware: 'auth',
-});
 </script>
 
 <style scoped lang="less">
@@ -433,7 +440,7 @@ definePageMeta({
     flex-direction: column;
     background: rgba(0, 0, 0, 0.5);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
-    border-radius: 10px;
+    border-radius: 8px;
 
     .card-interior-container {
       display: flex;
@@ -612,7 +619,7 @@ definePageMeta({
             &:hover {
               background: @login-button;
               color: @white;
-              border-radius: 5px;
+              border-radius: 4px;
               box-shadow:
                 0 0 4px @login-button,
                 0 0 8px @login-button,

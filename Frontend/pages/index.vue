@@ -3,7 +3,11 @@
 </template>
 
 <script>
-definePageMeta({
-  middleware: 'auth',
-});
+export default {
+  setup() {
+    definePageMeta({
+      middleware: 'auth',
+    });
+  },
+};
 </script>

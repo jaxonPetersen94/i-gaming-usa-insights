@@ -31,11 +31,7 @@ html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
-  background: linear-gradient(
-    to bottom right,
-    @background-light,
-    @background-dark
-  );
+  background: @primary-background-gradient;
   background-size: 100% 100%;
   background-attachment: fixed;
 }

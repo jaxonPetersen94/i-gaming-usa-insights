@@ -610,7 +610,7 @@ export default {
   background: rgba(0, 0, 0, 0.5);
   box-sizing: border-box;
   box-shadow: 0 15px 25px rgba(0, 0, 0, 0.6);
-  border-radius: 10px;
+  border-radius: 8px;
   height: 384px;
   transition: height 0.7s ease-in-out;
 
@@ -929,7 +929,7 @@ export default {
 .form-box button:hover {
   background: @login-button;
   color: @white;
-  border-radius: 5px;
+  border-radius: 4px;
   box-shadow:
     0 0 4px @login-button,
     0 0 8px @login-button,
