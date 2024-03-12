@@ -27,7 +27,9 @@
                   name="firstName"
                   type="text"
                   class="input-field"
+                  :rules="validateFirstName_Blur"
                   :value="user.firstName"
+                  @keypress="handleNameInput"
                   required
                 />
                 <ErrorMessage
@@ -42,12 +44,12 @@
                   name="date-of-birth"
                   type="text"
                   class="input-field"
+                  :rules="validateDateOfBirth_Blur"
                   :value="user.dob"
                   @keypress="handleDateOfBirthInput"
                   @paste="handleDateOfBirthInputPaste"
                   @keydown="handleDateOfBirthBackspace"
                   maxlength="10"
-                  required
                 />
                 <ErrorMessage
                   name="date-of-birth"
@@ -60,6 +62,7 @@
                   name="email"
                   type="text"
                   class="input-field"
+                  :rules="validateEmail_Blur"
                   :value="user.email"
                   required
                 />
@@ -73,7 +76,9 @@
                   name="lastName"
                   type="text"
                   class="input-field"
+                  :rules="validateLastName_Blur"
                   :value="user.lastName"
+                  @keypress="handleNameInput"
                   required
                 />
                 <ErrorMessage
@@ -88,12 +93,12 @@
                   name="phoneNumber"
                   type="text"
                   class="input-field"
+                  :rules="validatePhoneNumber_Blur"
                   :value="formattedPhoneNumber"
                   @keypress="handlePhoneNumberInput"
                   @paste="handlePhoneNumberInputPaste"
                   @keydown="handlePhoneNumberBackspace"
                   maxlength="14"
-                  required
                 />
                 <ErrorMessage
                   name="phoneNumber"
@@ -134,10 +139,9 @@ export default {
   },
 
   setup() {
-    const userStore = useUserStore();
-
     const dateOfBirthInput = ref<HTMLElement | null>(null);
     const phoneNumberInput = ref<HTMLElement | null>(null);
+    const userStore = useUserStore();
 
     const changeAccountPicture = () => {
       console.log('Open Account Picture change modal!');
@@ -166,6 +170,62 @@ export default {
         accessToken: user.value.accessToken,
       };
       await userStore.updateUser(updatedUser);
+    };
+
+    const validateFirstName_Blur = (value: any) => {
+      if (!value) {
+        return 'First Name is required';
+      }
+      return true;
+    };
+
+    const validateLastName_Blur = (value: any) => {
+      if (!value) {
+        return 'Last Name is required';
+      }
+      return true;
+    };
+
+    const validateDateOfBirth_Blur = (value: any) => {
+      if (!value) {
+        return true;
+      }
+      const regex = /^(0[1-9]|1[0-2])-(0[1-9]|1\d|2\d|3[01])-(19|20)\d{2}$/;
+      if (!regex.test(value)) {
+        return 'Must be a valid date of birth: MM-DD-YYYY';
+      }
+      return true;
+    };
+
+    const validatePhoneNumber_Blur = (value: any) => {
+      if (!value) {
+        return true;
+      }
+      const regex = /^\(\d{3}\) \d{3}-\d{4}$/;
+      if (!regex.test(value)) {
+        return 'Must be a valid phone number: (XXX) XXX-XXXX';
+      }
+      return true;
+    };
+
+    const validateEmail_Blur = (value: any) => {
+      if (!value) {
+        return 'Email is required';
+      }
+      const regex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i;
+      if (!regex.test(value)) {
+        return 'This field must be a valid email';
+      }
+      return true;
+    };
+
+    const handleNameInput = (event: any) => {
+      let char = String.fromCharCode(event.keyCode);
+      if (/^[A-Za-z']+$/.test(char)) {
+        return true;
+      } else {
+        event.preventDefault();
+      }
     };
 
     const handleDateOfBirthInput = (event: any) => {
@@ -335,6 +395,12 @@ export default {
       changeAccountPicture,
       changePassword,
       handleSaveChanges,
+      validateFirstName_Blur,
+      validateLastName_Blur,
+      validateDateOfBirth_Blur,
+      validatePhoneNumber_Blur,
+      validateEmail_Blur,
+      handleNameInput,
       handleDateOfBirthInput,
       handleDateOfBirthInputPaste,
       handleDateOfBirthBackspace,
@@ -499,6 +565,14 @@ definePageMeta({
                 user-select: none;
               }
             }
+          }
+
+          .form-validation-error-text {
+            width: 100%;
+            margin-top: 2px;
+            position: absolute;
+            text-align: center;
+            color: @validation-error-text;
           }
         }
 
