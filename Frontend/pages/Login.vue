@@ -153,8 +153,13 @@
           'submit-forgot-container-final': landedAtRegisterPage,
         }"
       >
-        <div class="submit-btn-container">
-          <button v-if="!loginProcessing" ref="submitButton">
+        <div
+          class="submit-btn-container"
+          :class="{
+            'submit-btn-container-hidden': forgotPasswordEmailSent,
+          }"
+        >
+          <button v-if="!loading" ref="submitButton">
             <span></span>
             <span></span>
             <span></span>
@@ -327,6 +332,10 @@ export default {
             handleTransitionEnd_UsernameEmailInputBox,
           );
         }
+      }
+
+      if (forgotPasswordEmailSent && forgotPasswordPageVisited.value) {
+        userStore.forgotPasswordEmailSent = false;
       }
     };
 
@@ -514,6 +523,14 @@ export default {
       return formType.value === 'Register';
     });
 
+    const getOppositeFormTypeText = computed(() => {
+      return formType.value === 'Register' ? 'Login' : 'Register';
+    });
+
+    const shouldFadeInOppositeFormText = computed(() => {
+      return formType.value === 'Login' && forgotPasswordPageVisited.value;
+    });
+
     const formTypeIsForgotPassword = computed(() => {
       return formType.value === 'Forgot Password';
     });
@@ -526,20 +543,14 @@ export default {
       );
     });
 
-    const shouldFadeInOppositeFormText = computed(() => {
-      return formType.value === 'Login' && forgotPasswordPageVisited.value;
-    });
-
-    const loginProcessing = computed(() => {
-      return userStore.loginProcessing;
-    });
-
-    const getOppositeFormTypeText = computed(() => {
-      return formType.value === 'Register' ? 'Login' : 'Register';
-    });
-
     const forgotPasswordEmailSent = computed(() => {
       return userStore.forgotPasswordEmailSent;
+    });
+
+    const loading = computed(() => {
+      return (
+        userStore.loginProcessing || userStore.forgotPasswordEmailProcessing
+      );
     });
 
     return {
@@ -572,12 +583,12 @@ export default {
       updatePassword,
       handleNameInput,
       formTypeIsRegister,
+      getOppositeFormTypeText,
+      shouldFadeInOppositeFormText,
       formTypeIsForgotPassword,
       shouldFadeInForgotPassword,
-      shouldFadeInOppositeFormText,
-      loginProcessing,
-      getOppositeFormTypeText,
       forgotPasswordEmailSent,
+      loading,
     };
   },
 };
@@ -723,6 +734,15 @@ export default {
   align-items: center;
   min-height: 40px;
   margin-bottom: 32px;
+  opacity: 1;
+  transition: opacity 1s;
+  visibility: visible;
+
+  &-hidden {
+    opacity: 0;
+    transition: opacity 0s;
+    visibility: hidden;
+  }
 }
 
 .submit-btn-animate-out {

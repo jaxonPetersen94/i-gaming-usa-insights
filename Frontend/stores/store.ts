@@ -8,8 +8,9 @@ export const useUserStore = defineStore('user', () => {
   const loginSuccessful = ref(false);
   const userUpdateProcessing = ref(false);
   const userUpdateSuccessful = ref(false);
-  const errorMsg = ref('');
+  const forgotPasswordEmailProcessing = ref(false);
   const forgotPasswordEmailSent = ref(false);
+  const errorMsg = ref('');
 
   const userIsAuthenticated = (): boolean => {
     return !!user.value.accessToken;
@@ -120,6 +121,7 @@ export const useUserStore = defineStore('user', () => {
 
   async function forgotPassword(email: string): Promise<boolean> {
     try {
+      forgotPasswordEmailProcessing.value = true;
       await $fetch(APP_CONST.API_USER_FORGOT_PASSWORD, {
         method: 'post',
         body: { email },
@@ -133,6 +135,8 @@ export const useUserStore = defineStore('user', () => {
         errorMsg.value = 'Error: Failed to send password reset email';
       }
       return false;
+    } finally {
+      forgotPasswordEmailProcessing.value = false;
     }
   }
 
@@ -142,8 +146,9 @@ export const useUserStore = defineStore('user', () => {
     loginSuccessful,
     userUpdateProcessing,
     userUpdateSuccessful,
-    errorMsg,
+    forgotPasswordEmailProcessing,
     forgotPasswordEmailSent,
+    errorMsg,
     userIsAuthenticated,
     signInUser,
     signOutUser,
