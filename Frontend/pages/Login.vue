@@ -200,6 +200,10 @@ export default {
     ErrorMessage,
   },
   setup() {
+    definePageMeta({
+      middleware: 'auth',
+    });
+
     const form = ref<any | null>(null);
     const formBox = ref<HTMLElement | null>(null);
     const submitButton = ref<HTMLElement | null>(null);

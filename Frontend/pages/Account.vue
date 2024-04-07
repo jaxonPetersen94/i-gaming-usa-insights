@@ -121,7 +121,7 @@
         </Form>
       </div>
     </div>
-    <PopUpModal v-if="isModalOpen" />
+    <PopUpModal v-if="isModalOpen" @closePopUp="closePopUp" />
   </div>
 </template>
 
@@ -142,19 +142,21 @@ export default {
   },
 
   setup() {
+    definePageMeta({
+      middleware: 'auth',
+    });
+
     const dateOfBirthInput = ref<HTMLElement | null>(null);
     const phoneNumberInput = ref<HTMLElement | null>(null);
     const isModalOpen = ref(false);
     const userStore = useUserStore();
 
-    definePageMeta({
-      middleware: 'auth',
-    });
-
     const changeAccountPicture = () => {
-      console.log('changeAccountPicture()');
       isModalOpen.value = true;
-      console.log('isModalOpen.value =', isModalOpen.value);
+    };
+
+    const closePopUp = () => {
+      isModalOpen.value = false;
     };
 
     const changePassword = () => {
@@ -404,6 +406,7 @@ export default {
       phoneNumberInput,
       isModalOpen,
       changeAccountPicture,
+      closePopUp,
       changePassword,
       handleSaveChanges,
       validateFirstName_Blur,
@@ -495,7 +498,7 @@ export default {
               border-width: 0;
               background-color: transparent;
               cursor: pointer;
-              z-index: 999;
+              z-index: 1;
 
               &:active {
                 box-shadow: inset 0 0 20px 2px rgb(36, 36, 36);

@@ -115,7 +115,7 @@ nav {
   appearance: none;
   -webkit-appearance: none;
   margin: 0;
-  z-index: 999;
+  z-index: 1;
   width: 40px;
   height: 40px;
   background-color: transparent;

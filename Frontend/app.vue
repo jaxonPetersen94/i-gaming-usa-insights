@@ -13,7 +13,7 @@ export default {
     const userStore = useUserStore();
 
     const userIsAuthenticated = computed(() => {
-      return userStore.loginSuccessful && userStore.user.email;
+      return userStore.userIsAuthenticated();
     });
 
     return {
