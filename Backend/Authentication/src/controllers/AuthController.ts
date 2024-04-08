@@ -1,23 +1,15 @@
-import { admin, auth } from '../firebase.js';
-import {
-  User,
-  createUserWithEmailAndPassword,
-  sendPasswordResetEmail,
-  signInWithEmailAndPassword,
-  signOut,
-} from 'firebase/auth';
-import { LoginUserForm, RegisterUserForm } from '../models/User.js';
+import { admin } from '../firebase.js';
+import { mongoDatabase } from '../app.js';
 
-async function login(newUser: LoginUserForm) {
-  return signInWithEmailAndPassword(auth, newUser.email, newUser.password);
+async function login(user) {
+  return await mongoDatabase.collection('Users').findOne({
+    $or: [{ email: user.email }, { firebaseUid: user.uid }],
+  });
 }
 
-async function logOut() {
-  return signOut(auth);
-}
-
-async function register(newUser: RegisterUserForm) {
-  return createUserWithEmailAndPassword(auth, newUser.email, newUser.password);
+async function register(newUser: any) {
+  await mongoDatabase.collection('Users').insertOne(newUser);
+  return newUser;
 }
 
 async function updateFirebaseUser(updatedUser: any) {
@@ -26,10 +18,7 @@ async function updateFirebaseUser(updatedUser: any) {
     displayName: `${updatedUser.firstName} ${updatedUser.lastName}`,
     phoneNumber: updatedUser.phoneNumber,
   });
+  // Move DB actions into here?
 }
 
-async function forgotPassword(email: string) {
-  return sendPasswordResetEmail(auth, email);
-}
-
-export { login, logOut, register, updateFirebaseUser, forgotPassword };
+export { login, register, updateFirebaseUser };

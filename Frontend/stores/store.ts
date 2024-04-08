@@ -1,9 +1,17 @@
 import { defineStore } from 'pinia';
 import type { RegisterUserPostRequest, User } from '../types/User/types';
 import APP_CONST from '~/constants/appConstants';
+import { auth } from '../firebase';
+import {
+  createUserWithEmailAndPassword,
+  sendPasswordResetEmail,
+  signInWithEmailAndPassword,
+  signOut,
+} from 'firebase/auth';
 
 export const useUserStore = defineStore('user', () => {
   const user = ref({} as User);
+  const sessionCheckCompleted = ref(false);
   const loginProcessing = ref(false);
   const loginSuccessful = ref(false);
   const userUpdateProcessing = ref(false);
@@ -19,21 +27,29 @@ export const useUserStore = defineStore('user', () => {
   async function signInUser(userLoginData: any): Promise<boolean> {
     try {
       loginProcessing.value = true;
-      const data: any = await $fetch(APP_CONST.API_USER_LOGIN, {
-        method: 'post',
-        body: userLoginData,
-      });
+      const firebaseUser: any = await signInWithEmailAndPassword(
+        auth,
+        userLoginData.email,
+        userLoginData.password,
+      );
       loginSuccessful.value = true;
+      const dbUser: any = await $fetch(APP_CONST.API_USER_LOGIN, {
+        method: 'post',
+        body: {
+          email: auth.currentUser?.email,
+          firebaseUid: auth.currentUser?.uid,
+        },
+      });
       user.value = {
-        firebaseUid: data.firebaseUid,
-        firstName: data.firstName,
-        lastName: data.lastName,
-        email: data.email,
-        ...(data.dob && { dob: data.dob }),
-        ...(data.phoneNumber && {
-          phoneNumber: data.phoneNumber,
+        firebaseUid: dbUser.firebaseUid,
+        firstName: dbUser.firstName,
+        lastName: dbUser.lastName,
+        email: dbUser.email,
+        ...(dbUser.dob && { dob: dbUser.dob }),
+        ...(dbUser.phoneNumber && {
+          phoneNumber: dbUser.phoneNumber,
         }),
-        accessToken: data.accessToken,
+        accessToken: firebaseUser.user.accessToken,
       };
       return true;
     } catch (error: any) {
@@ -50,8 +66,9 @@ export const useUserStore = defineStore('user', () => {
   }
 
   async function signOutUser() {
-    await $fetch(APP_CONST.API_USER_LOGOUT, { method: 'post' });
+    await signOut(auth);
     loginSuccessful.value = false;
+    sessionCheckCompleted.value = false;
     user.value = {} as User;
   }
 
@@ -60,18 +77,28 @@ export const useUserStore = defineStore('user', () => {
   ): Promise<boolean> {
     try {
       loginProcessing.value = true;
-      const data: any = await $fetch(APP_CONST.API_USER_REGISTER, {
+      const newFirebaseUser: any = await createUserWithEmailAndPassword(
+        auth,
+        newUserData.email,
+        newUserData.password,
+      );
+      const newDbUser: any = await $fetch(APP_CONST.API_USER_REGISTER, {
         method: 'post',
-        body: newUserData,
+        body: {
+          firebaseUid: newFirebaseUser.user.uid,
+          email: newFirebaseUser.user.email,
+          firstName: newUserData.firstName,
+          lastName: newUserData.lastName,
+        },
       });
-      loginSuccessful.value = true;
       user.value = {
-        firebaseUid: data.firebaseUid,
-        firstName: data.firstName,
-        lastName: data.lastName,
-        email: data.email,
-        accessToken: data.accessToken,
+        firebaseUid: newDbUser.firebaseUid,
+        firstName: newDbUser.firstName,
+        lastName: newDbUser.lastName,
+        email: newDbUser.email,
+        accessToken: newFirebaseUser.user.accessToken,
       };
+      loginSuccessful.value = true;
       return true;
     } catch (error: any) {
       loginSuccessful.value = false;
@@ -122,10 +149,7 @@ export const useUserStore = defineStore('user', () => {
   async function forgotPassword(email: string): Promise<boolean> {
     try {
       forgotPasswordEmailProcessing.value = true;
-      await $fetch(APP_CONST.API_USER_FORGOT_PASSWORD, {
-        method: 'post',
-        body: { email },
-      });
+      await sendPasswordResetEmail(auth, email);
       forgotPasswordEmailSent.value = true;
       return true;
     } catch (error: any) {
@@ -142,6 +166,7 @@ export const useUserStore = defineStore('user', () => {
 
   return {
     user,
+    sessionCheckCompleted,
     loginProcessing,
     loginSuccessful,
     userUpdateProcessing,
